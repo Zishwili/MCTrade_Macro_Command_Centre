@@ -1,18 +1,12 @@
-# MCTrade EST26 Command Centre
-
 # MCTrade EST26 Command Centre — Reworded README
 
 A static dashboard designed for GitHub Pages. It hosts the four supplied HTML terminals while leaving their calculation logic untouched.
 
-## What is included
-- Preserved copies of the Pre-CPI, Pre-FOMC, Pre-NFP and Pre-PPI terminal files.
-- Copy-ready sourcing prompts for each terminal, including aggressive source discovery, precise cutoff and vintage rules, direct URLs, and same-parameter carry-forward.
-- An encrypted local event ledger that compares each terminal's prediction against manually observed TradingView Buy/Sell direction and candle points.
-- Per-terminal hit-rate tracking, outcome distribution, CSV export, and encrypted JSON backup.
-
 ## Publishing to GitHub Pages
 1. Create a GitHub repository and upload everything in this folder, including the `terminals/` directory.
 2. Go to **Settings → Pages**, set deployment to **Deploy from a branch**, choose `main` and `/ (root)`, then save.
+3. After deployment finishes, open the Pages URL and use HTTPS.
+4. On the first visit, create a strong vault passphrase of at least 12 characters. Back up the encrypted vault regularly.
 3. After deployment finishes, open the Pages URL and use HTTPS.
 4. On the first visit, create a strong vault passphrase of at least 12 characters. Back up the encrypted vault regularly.
 
