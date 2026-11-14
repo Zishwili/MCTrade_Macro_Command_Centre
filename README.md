@@ -1,4 +1,4 @@
-# MCTrade EST26 Command Centre — Reworded README
+# MCTrade EST26 Command Centre — README
 
 A static dashboard designed for GitHub Pages. It hosts the four supplied HTML terminals while leaving their calculation logic untouched.
 
