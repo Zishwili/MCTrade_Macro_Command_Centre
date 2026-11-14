@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en" class="mc-locked">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAUUSD Pre-PPI Terminal v2 — Calibration Audit</title>
+<style>
+:root{--bg:#0b1020;--panel:#121a2d;--panel2:#172239;--line:#2a3855;--text:#eef3ff;--muted:#9eacc7;--accent:#7dd3fc;--green:#4ade80;--red:#fb7185;--amber:#fbbf24;--danger:#f87171}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#142342 0%,var(--bg) 55%);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{padding:26px 18px 18px;text-align:center;border-bottom:1px solid var(--line)}
+.kicker{color:var(--accent);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:.72rem}
+h1{font-size:clamp(1.4rem,3.8vw,2.15rem);line-height:1.15;margin:6px 0}
+.subtitle{color:var(--muted);max-width:840px;margin:0 auto;font-size:.92rem}
+.clock{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.85rem;color:var(--accent);margin-top:6px}
+main{max-width:1180px;margin:20px auto;padding:0 14px 30px}
+.banner{border:1px solid #715b2a;background:#2b2415;color:#ffe7a3;padding:12px 15px;border-radius:11px;margin-bottom:16px;font-size:.88rem}
+.banner strong{color:#ffd766}
+.banner-ok{border-color:#1e5b3a;background:#10261a;color:#b3f0c8}
+.banner-danger{border-color:#7a2735;background:#2a0f14;color:#ffc4cc}
+.layout{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+.card{background:linear-gradient(180deg,var(--panel),#0f1728);border:1px solid var(--line);border-radius:14px;padding:17px;box-shadow:0 10px 28px #0002;margin-bottom:16px}
+h2{font-size:1.05rem;margin:0 0 12px;color:#eaf2ff}
+h3{font-size:.92rem;margin:16px 0 6px;color:#cfe0ff}
+p.muted,span.muted{color:var(--muted);font-size:.88rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field label{display:block;color:#c6d2e9;font-size:.81rem;margin-bottom:4px}
+.field input,.field select{width:100%;background:#0a1222;color:var(--text);border:1px solid #354663;border-radius:8px;padding:9px 10px;font:inherit;min-width:0;font-size:.92rem}
+.field input:focus,.field select:focus{outline:2px solid #38bdf8;border-color:transparent}
+.help{font-size:.74rem;color:var(--muted);margin-top:3px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button{border:0;border-radius:8px;padding:10px 13px;font:700 .85rem inherit;cursor:pointer}
+.primary{background:var(--accent);color:#071322}
+.secondary{background:#24334f;color:var(--text);border:1px solid #3b4b69}
+.danger-btn{background:#4a1f28;color:#ffd0d8;border:1px solid #7a2735}
+.resultbox{background:#0a1222;border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:12px}
+.result-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.result{font-size:1.9rem;font-weight:800;margin:3px 0 0}
+.buy{color:var(--green)} .sell{color:var(--red)} .nosignal{color:var(--amber)} .neutral{color:var(--muted)}
+.metricrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.metric{padding:11px;background:#111c31;border:1px solid var(--line);border-radius:9px}
+.metric .num{font-size:1.15rem;font-weight:750;font-variant-numeric:tabular-nums}
+.metric .small{font-size:.74rem;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{text-align:right;padding:7px 6px;border-bottom:1px solid #273550;font-variant-numeric:tabular-nums}
+th{color:#b9c8e3;font-weight:650;font-size:.78rem}
+th:first-child,td:first-child{text-align:left}
+tbody tr:last-child td{border-bottom:0}
+.tablewrap{overflow-x:auto}
+.num-pos{color:var(--green)} .num-neg{color:var(--red)} .num-warn{color:var(--amber)}
+.formula{background:#0a1222;border:1px solid var(--line);padding:11px;border-radius:9px;overflow-wrap:anywhere;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.8rem;color:#c9d8f5}
+.footnote{font-size:.78rem;color:#8291ad;margin-top:8px}
+.case-row{transition:background .15s}
+.case-row:hover{background:#152038}
+.bar-container{height:6px;background:#0a1222;border-radius:3px;overflow:hidden;position:relative;min-width:80px}
+.bar-fill{height:100%;transition:width .3s}
+.bar-buy{background:var(--green)} .bar-sell{background:var(--red)} .bar-ns{background:var(--amber)}
+details{background:#0a1222;border:1px solid var(--line);border-radius:9px;padding:10px;margin-top:8px}
+details summary{cursor:pointer;font-weight:650;color:#cfe0ff;font-size:.9rem}
+details[open] summary{margin-bottom:10px}
+.calib-row{display:grid;grid-template-columns:1.4fr .7fr .7fr .7fr;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #1a2540;font-size:.82rem}
+.calib-row input{width:100%;background:#050b18;color:var(--text);border:1px solid #354663;border-radius:6px;padding:6px 7px;font-size:.82rem;font-variant-numeric:tabular-nums}
+.calib-row input:focus{outline:2px solid #38bdf8;border-color:transparent}
+.tag{display:inline-block;padding:1px 7px;border-radius:5px;font-size:.7rem;font-weight:700;letter-spacing:.04em}
+.tag-ok{background:#123a25;color:#8ee0aa} .tag-warn{background:#3a2c10;color:#f2c96e}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:6px 0 2px}
+.legend span::before{content:"■ ";font-size:.9em}
+.legend .l-buy::before{color:var(--green)} .legend .l-sell::before{color:var(--red)} .legend .l-ns::before{color:var(--amber)}
+.aux-record{margin-top:8px;font-size:.82rem;color:var(--muted)}
+.aux-record strong{color:#cfe0ff}
+footer{text-align:center;color:#8291ad;padding:20px 10px;border-top:1px solid var(--line);font-size:.76rem}
+@media(max-width:820px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.grid{grid-template-columns:1fr}.metricrow{grid-template-columns:1fr 1fr}.calib-row{grid-template-columns:1fr 1fr}}
+
+/* ===== MC-CORE: lock door + numeric helper + history (added) ===== */
+html.mc-locked{overflow:hidden!important}
+html.mc-locked body>*:not(#mcDoor){visibility:hidden!important}
+#mcDoor{position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;visibility:visible;
+  transform:translateY(0);transition:transform 1.1s cubic-bezier(.45,.05,.3,1);animation:mcDrop 1.15s cubic-bezier(.45,.05,.3,1) 1;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.55) 0,rgba(0,0,0,.0) 4%,rgba(0,0,0,0) 96%,rgba(0,0,0,.55) 100%),
+    repeating-linear-gradient(180deg,rgba(255,255,255,.05) 0,rgba(255,255,255,.05) 1px,rgba(0,0,0,0) 1px,rgba(0,0,0,0) 9px),
+    linear-gradient(180deg,#5b9bff 0,#3b82f6 4px,#2a66d9 30%,#1f52bd 80%,#163f95 92%,#071538 92.4%,#071538 96.8%,#0e2a6e 100%);
+  background-size:100% 100%,100% 100%,100% 132px;background-repeat:no-repeat,repeat,repeat-y;
+  box-shadow:0 8px 40px rgba(0,0,0,.6)}
+#mcDoor.open{transform:translateY(-104%);animation:none;transition:transform 1.35s cubic-bezier(.55,.05,.35,1),visibility 0s linear 1.35s;visibility:hidden}
+@keyframes mcDrop{from{transform:translateY(-104%)}to{transform:translateY(0)}}
+#mcDoor::before,#mcDoor::after{content:"";position:absolute;top:0;bottom:0;width:10px;background:linear-gradient(90deg,#0a1636,#26407a 55%,#0a1636);opacity:.9}
+#mcDoor::before{left:0}#mcDoor::after{right:0}
+#mcDoor .mc-seal{position:absolute;left:0;right:0;bottom:0;height:16px;background:repeating-linear-gradient(90deg,#10151f 0,#10151f 14px,#1b2332 14px,#1b2332 16px);border-top:3px solid #0a0e17;box-shadow:0 -2px 8px rgba(0,0,0,.5)}
+#mcDoor .mc-handle{position:absolute;left:50%;bottom:34px;width:120px;height:9px;margin-left:-60px;border-radius:6px;background:linear-gradient(180deg,#cfd8e8,#7e8aa3);box-shadow:0 2px 4px rgba(0,0,0,.6)}
+#mcDoor .mc-pad{position:relative;width:min(86vw,330px);padding:22px 20px 20px;border-radius:16px;text-align:center;color:#dbe7ff;
+  background:linear-gradient(180deg,#2b3446,#171d2b);border:2px solid #0a1230;box-shadow:0 0 0 3px #3a4a6d,0 18px 40px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.12);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+#mcDoor .mc-led{position:absolute;top:12px;right:14px;width:11px;height:11px;border-radius:50%;background:#ef4444;box-shadow:0 0 10px #ef4444}
+#mcDoor.open .mc-led{background:#22c55e;box-shadow:0 0 10px #22c55e}
+#mcDoor .mc-ico{width:34px;height:34px;margin:0 auto 6px;display:block;color:#8fb4ff}
+#mcDoor .mc-brand{font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:#8da2cc;margin-bottom:14px}
+#mcDoor input#mcCode{display:block;width:100%;box-sizing:border-box;padding:13px 12px;font:600 1.25rem ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.4em;text-align:center;color:#e8f0ff;background:#0a1020;border:1px solid #3a4a6d;border-radius:10px;outline:none;margin:0}
+#mcDoor input#mcCode:focus{border-color:#5b9bff;box-shadow:0 0 0 3px rgba(91,155,255,.25)}
+#mcDoor button#mcGo{display:block;width:100%!important;margin:12px 0 0!important;padding:12px!important;border:0!important;border-radius:10px!important;font:700 .95rem system-ui,sans-serif!important;letter-spacing:.06em;color:#06122e!important;background:linear-gradient(180deg,#8fc0ff,#4f8cff)!important;cursor:pointer}
+#mcDoor button#mcGo:disabled{opacity:.5;cursor:not-allowed}
+#mcDoor .mc-msg{min-height:1.3em;margin-top:10px;font-size:.8rem;color:#ff8c96}
+#mcDoor .mc-shake{animation:mcShake .45s}
+@keyframes mcShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(5px)}}
+#mcPill{position:fixed;right:12px;bottom:12px;z-index:9000;display:flex;gap:6px;opacity:.85}
+#mcPill button{width:auto!important;margin:0!important;padding:6px 10px!important;border-radius:999px!important;font:600 .72rem system-ui,sans-serif!important;letter-spacing:.03em;color:#cfe0ff!important;background:rgba(15,25,55,.92)!important;border:1px solid #2f4a8a!important;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#mcPill button:hover{background:#1b2f66!important}
+#mcCodeDlg{position:fixed;inset:0;z-index:9500;background:rgba(2,6,20,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+#mcCodeDlg[hidden]{display:none}
+#mcCodeDlg .box{width:min(92vw,340px);background:#131a2c;border:1px solid #2f4a8a;border-radius:14px;padding:18px;color:#dbe7ff;font-family:system-ui,sans-serif}
+#mcCodeDlg .t{font-weight:700;margin-bottom:10px}
+#mcCodeDlg input{display:block;width:100%;box-sizing:border-box;margin:0 0 8px;padding:10px;border-radius:8px;border:1px solid #3a4a6d;background:#0a1020;color:#e8f0ff;font:600 1rem ui-monospace,Consolas,monospace;letter-spacing:.3em;text-align:center}
+#mcCodeDlg .row{display:flex;gap:8px;margin-top:6px}
+#mcCodeDlg button{flex:1;width:auto!important;margin:0!important;padding:10px!important;border-radius:8px!important;border:1px solid #3a4a6d!important;font:700 .85rem system-ui,sans-serif!important;color:#dbe7ff!important;background:#1d2a4a!important;cursor:pointer}
+#mcCodeDlg button.go{background:linear-gradient(180deg,#8fc0ff,#4f8cff)!important;color:#06122e!important;border:0!important}
+#mcCodeDlg .m{min-height:1.2em;font-size:.78rem;color:#ff8c96;margin-top:6px}
+#mcCodeDlg .m.ok{color:#7ee2a8}
+@media (prefers-reduced-motion:reduce){#mcDoor,#mcDoor.open{transition-duration:.01s!important;animation-duration:.01s!important}}
+/* numeric helper */
+.mc-nw{position:relative;display:block;max-width:100%}
+.mc-nw.mc-nw-inline{display:inline-block;flex:0 0 auto}
+input.mc-has-neg{padding-right:32px!important}
+.mc-neg{position:absolute!important;right:4px;top:50%;transform:translateY(-50%);width:23px!important;height:23px!important;min-width:0!important;margin:0!important;padding:0!important;display:flex!important;align-items:center;justify-content:center;
+  border-radius:6px!important;border:1px solid rgba(148,163,184,.4)!important;background:rgba(148,163,184,.14)!important;color:#cbd5e1!important;font:700 14px/1 system-ui,sans-serif!important;letter-spacing:0!important;cursor:pointer;box-shadow:none!important;opacity:1}
+.mc-neg:hover,.mc-neg:active{transform:translateY(-50%)!important;background:rgba(148,163,184,.3)!important}
+/* history */
+.mch{--mch-panel:#121722;--mch-inner:#0d121c;--mch-line:#242c3d;--mch-text:#e7ecf5;--mch-muted:#8b97ad;--mch-accent:#d4af37;--mch-up:#26c281;--mch-down:#e5484d;--mch-flat:#fbbf24;
+  background:var(--mch-panel);border:1px solid var(--mch-line);border-radius:14px;padding:18px;margin:22px 0;color:var(--mch-text);box-shadow:0 10px 30px rgba(0,0,0,.3);font-family:inherit;font-size:14px;line-height:1.45;text-align:left}
+.mch *{box-sizing:border-box}
+.mch .mch-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.mch .mch-title{font-size:.86rem;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--mch-accent);margin:0}
+.mch .mch-count{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:999px;font-size:.7rem;background:rgba(255,255,255,.07);color:var(--mch-text);border:1px solid var(--mch-line);letter-spacing:0;vertical-align:middle}
+.mch .mch-sub{font-size:.76rem;color:var(--mch-muted);margin:0 0 12px}
+.mch .mch-bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:12px}
+.mch button.mch-btn{width:auto!important;margin:0!important;padding:7px 12px!important;border-radius:8px!important;border:1px solid var(--mch-line)!important;background:var(--mch-inner)!important;color:var(--mch-text)!important;font:600 .76rem system-ui,sans-serif!important;letter-spacing:.02em;cursor:pointer;opacity:1}
+.mch button.mch-btn:hover{border-color:var(--mch-accent)!important}
+.mch button.mch-btn.pri{background:var(--mch-accent)!important;color:#0b0f1a!important;border-color:transparent!important}
+.mch button.mch-btn.dng{color:#ff9aa2!important}
+.mch .mch-chip{display:inline-block;font-size:.7rem;padding:2px 9px;border-radius:999px;border:1px solid var(--mch-line);color:var(--mch-muted)}
+.mch .mch-chip.warn{color:#fbbf24;border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.08)}
+.mch .mch-chip.ok{color:#6ee7a8;border-color:rgba(110,231,168,.4)}
+.mch .mch-warn{font-size:.78rem;padding:8px 10px;border-radius:8px;border:1px solid rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:#fecaca;margin-bottom:10px}
+.mch .mch-empty{text-align:center;color:var(--mch-muted);font-style:italic;padding:22px 8px;border:1px dashed var(--mch-line);border-radius:10px}
+.mch details.mch-item{background:var(--mch-inner);border:1px solid var(--mch-line);border-radius:10px;margin-bottom:8px;padding:0}
+.mch details.mch-item[open]{border-color:var(--mch-accent)}
+.mch details.mch-item>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 12px;font-size:.82rem}
+.mch details.mch-item>summary::-webkit-details-marker{display:none}
+.mch .mch-ts{color:var(--mch-muted);font-variant-numeric:tabular-nums;font-size:.78rem}
+.mch .mch-call{font-weight:800;font-size:.72rem;letter-spacing:.05em;padding:2px 9px;border-radius:999px;border:1px solid var(--mch-line)}
+.mch .mch-call.up{color:var(--mch-up);border-color:rgba(38,194,129,.45);background:rgba(38,194,129,.1)}
+.mch .mch-call.down{color:var(--mch-down);border-color:rgba(229,72,77,.45);background:rgba(229,72,77,.1)}
+.mch .mch-call.flat{color:var(--mch-flat);border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.08)}
+.mch .mch-score{font-weight:700;font-variant-numeric:tabular-nums}
+.mch .mch-noted{margin-left:auto;font-size:.7rem;color:#6ee7a8}
+.mch .mch-pending{margin-left:auto;font-size:.7rem;color:var(--mch-muted)}
+.mch .mch-body{padding:4px 12px 14px;border-top:1px solid var(--mch-line)}
+.mch .mch-sec{font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;color:var(--mch-accent);margin:12px 0 6px;font-weight:700}
+.mch .mch-kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.mch .mch-kv>div{background:rgba(255,255,255,.03);border:1px solid var(--mch-line);border-radius:8px;padding:6px 9px;min-width:0}
+.mch .mch-kv .k{font-size:.66rem;color:var(--mch-muted);text-transform:uppercase;letter-spacing:.06em}
+.mch .mch-kv .v{font-size:.86rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;white-space:pre-wrap}
+.mch .mch-kv .long{grid-column:1/-1}
+.mch .mch-agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.mch .mch-agrid .full{grid-column:1/-1}
+.mch label.mch-f{display:block!important;margin:0!important;font-size:.7rem!important;text-transform:uppercase!important;letter-spacing:.06em!important;color:var(--mch-muted)!important}
+.mch label.mch-f>input,.mch label.mch-f>select,.mch label.mch-f>textarea,.mch label.mch-f .mc-nw input{display:block;width:100%!important;margin:4px 0 0!important;padding:8px 10px!important;border-radius:8px!important;border:1px solid var(--mch-line)!important;background:var(--mch-panel)!important;color:var(--mch-text)!important;font:500 .86rem system-ui,sans-serif!important;text-transform:none!important;letter-spacing:0!important;height:auto!important}
+.mch label.mch-f>textarea{min-height:92px;resize:vertical}
+.mch .mch-arow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.mch .mch-saved{font-size:.74rem;color:#6ee7a8;min-height:1em}
+.mch-toast{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:9600;background:#111827;color:#f1f5f9;border:1px solid #334155;border-radius:999px;padding:9px 16px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:90vw;text-align:center}
+
+</style>
+</head>
+<body>
+<!-- MC-CORE: garage-door lock (added) -->
+<div id="mcDoor" aria-label="Locked">
+  <div class="mc-pad">
+    <div class="mc-led" id="mcLed"></div>
+    <svg class="mc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor"/></svg>
+    <div class="mc-brand">mayibongwecy</div>
+    <input id="mcCode" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Access code">
+    <button id="mcGo" type="button">Unlock</button>
+    <div class="mc-msg" id="mcMsg" role="status" aria-live="polite"></div>
+  </div>
+  <div class="mc-handle"></div>
+  <div class="mc-seal"></div>
+</div>
+<div id="mcPill"><button type="button" id="mcLockBtn" title="Lock terminal">Lock</button><button type="button" id="mcChgBtn" title="Change access code">Change code</button></div>
+<div id="mcCodeDlg" hidden><div class="box">
+  <div class="t">Change access code</div>
+  <input id="mcOld" type="password" autocomplete="off" placeholder="Current code" aria-label="Current code">
+  <input id="mcNew" type="password" autocomplete="off" placeholder="New code" aria-label="New code">
+  <input id="mcNew2" type="password" autocomplete="off" placeholder="Repeat new code" aria-label="Repeat new code">
+  <div class="m" id="mcDlgMsg"></div>
+  <div class="row"><button type="button" id="mcDlgCancel">Cancel</button><button type="button" class="go" id="mcDlgSave">Save</button></div>
+</div></div>
+
+<header>
+  <div class="kicker">v2 · Calibration Audit Edition</div>
+  <h1>XAUUSD Pre-PPI Directional Bias Terminal</h1>
+  <p class="subtitle">Same equation, same eight calls. Full audit trail. Fragile scores flagged <strong>NO SIGNAL</strong>.</p>
+  <div id="clock" class="clock">--:--:-- SAST</div>
+</header>
+<main>
+  <div class="banner" id="topBanner">
+    <strong>Status:</strong> v1 equation preserved verbatim — outcomes reproduce identically.
+    A configurable <em>NO SIGNAL</em> band flags fragile scores; only <strong>June 11 (S = +0.0258)</strong> falls inside at default band 1.0.
+    Gold trend and cutoff are recorded for audit but do not enter the score (gold-trend coefficient is 0).
+  </div>
+
+  <div class="layout">
+    <!-- ============================================================
+         SECTION 1 — full "Enter indicator values" restored
+         ============================================================ -->
+    <section class="card">
+      <h2>1. Enter indicator values</h2>
+      <p class="muted" style="margin-top:-6px">Use consistent definitions, units, and timestamps for every release. The default values are blank so the terminal does not silently reuse the calibration cases.</p>
+      <form id="form" autocomplete="off">
+        <div class="grid">
+          <div class="field"><label for="crude">Crude oil 24h change (%)</label><input id="crude" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 1.25" required></div>
+          <div class="field"><label for="copper">Copper 24h change (%)</label><input id="copper" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 0.40" required></div>
+          <div class="field"><label for="crb">CRB index 5-day change (%)</label><input id="crb" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 1.10" required></div>
+          <div class="field"><label for="bdi">Baltic Dry Index daily change (%)</label><input id="bdi" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. -0.50" required></div>
+          <div class="field"><label for="gscpi">GSCPI level</label><input id="gscpi" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 1.20" required></div>
+          <div class="field"><label for="cass">Cass Freight Expenditure MoM (%)</label><input id="cass" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 0.80" required></div>
+          <div class="field"><label for="ism">ISM Manufacturing Prices Paid</label><input id="ism" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 72.5" required></div>
+          <div class="field"><label for="pmi">S&amp;P US PMI Input Prices</label><input id="pmi" type="text" inputmode="decimal" data-num autocomplete="off" step="any" placeholder="e.g. 55.0" required></div>
+          <div class="field">
+            <label for="goldTrend">Pre-release gold trend (4H / 15M)</label>
+            <select id="goldTrend">
+              <option value="1">Bullish</option>
+              <option value="0" selected>Neutral</option>
+              <option value="-1">Bearish</option>
+            </select>
+            <div class="help">Recorded for audit; coefficient is 0 in this fitted equation.</div>
+          </div>
+          <div class="field">
+            <label for="cutoff">Vintage cutoff (optional)</label>
+            <input id="cutoff" type="text" placeholder="e.g. 14:15 SAST · 15 Oct 2026">
+            <div class="help">Label only; no data is fetched automatically.</div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit" class="primary">Calculate bias</button>
+          <button type="button" class="secondary" id="clearBtn">Clear inputs</button>
+          <button type="button" class="secondary" id="exampleBtn">Load example row</button>
+          <button type="button" class="secondary" id="loadBtn">Load March 18 case</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============================================================
+         SECTION 2 — Output
+         ============================================================ -->
+    <section class="card">
+      <h2>2. Model output</h2>
+      <div class="resultbox" aria-live="polite">
+        <div class="result-label">Directional bias</div>
+        <div id="bias" class="result neutral">Awaiting inputs</div>
+        <div id="biasNote" class="muted">Enter all eight numeric indicators and calculate.</div>
+      </div>
+      <div class="metricrow">
+        <div class="metric"><div class="small">Composite score S</div><div class="num" id="score">—</div></div>
+        <div class="metric"><div class="small">Standardised inputs</div><div class="num" id="zcount">0 / 8</div></div>
+      </div>
+      <div class="metricrow" style="margin-top:9px">
+        <div class="metric"><div class="small">NO SIGNAL band</div><div class="num" id="bandVal">±1.00</div></div>
+        <div class="metric"><div class="small">Bootstrap flip prob.</div><div class="num" id="bootProb">—</div></div>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label for="noSignalBand">NO SIGNAL band — |S| below this → NO SIGNAL</label>
+        <input type="number" id="noSignalBand" value="1.0" step="0.1" min="0">
+        <div class="help">Default 1.0. Only June 11 (|S| = 0.0258) is inside. Changing this reclassifies cases in the backtest table.</div>
+      </div>
+      <h3>Score interpretation</h3>
+      <p class="muted">Score above the band = BUY XAUUSD. Score below the negative band = SELL XAUUSD. Inside the band = NO SIGNAL. Magnitude is not a calibrated probability.</p>
+      <h3>Vintage record</h3>
+      <div id="vintage" class="muted">No cutoff label entered.</div>
+      <div class="actions"><button type="button" class="secondary" id="copyBtn">Copy results</button></div>
+      <div id="copyStatus" class="help" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <!-- Section 3 — Contribution audit -->
+  <section class="card">
+    <h2>3. Standardisation and contribution audit</h2>
+    <p class="muted" style="margin-top:-6px">Each indicator is transformed to a Z-score using the frozen 2026 reference mean and SD, then multiplied by the frozen weight. <strong>Rows sum to S.</strong></p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Indicator</th><th>Input</th><th>μ</th><th>σ</th><th>Z</th><th>w</th><th>Contribution</th></tr></thead>
+        <tbody id="auditBody">
+          <tr><td colspan="7" class="muted" style="text-align:left">Results will appear after calculating.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="auxRecord" class="aux-record"></div>
+  </section>
+
+  <!-- Section 4 — Fragility diagnostics -->
+  <section class="card">
+    <h2>4. Fragility diagnostics — interactive case</h2>
+    <p class="muted" style="margin-top:-6px">How far each input alone must move (in native units, others held fixed) to drive S to exactly zero. <strong>Small flip-distance = fragile score.</strong></p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Indicator</th><th>Flip-distance</th><th>Direction</th><th>Robustness</th></tr></thead>
+        <tbody id="flipBody">
+          <tr><td colspan="4" class="muted" style="text-align:left">Calculate first.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Bootstrap sign-flip probability</h3>
+    <p class="muted" style="margin-top:2px">Each Z-score perturbed by N(0, 0.10) across 1,000 draws. Fraction of draws where sign(S) flips.</p>
+    <div id="bootstrapOut" class="formula">—</div>
+  </section>
+
+  <!-- Section 5 — Correlation -->
+  <section class="card">
+    <h2>5. Indicator correlation — across the 8 calibration cases</h2>
+    <p class="muted" style="margin-top:-6px">High |r| between two predictors means the fitted weights on those two are unstable. Macro-proxy clusters are a known weakness of the v1 calibration.</p>
+    <div class="tablewrap"><table id="corrTable"></table></div>
+    <p class="footnote" id="collinearNote"></p>
+  </section>
+
+  <!-- Section 6 — Backtest -->
+  <section class="card">
+    <h2>6. Backtest replay — 8 historical 2026 cases</h2>
+    <p class="muted" style="margin-top:-6px">Same equation. Same reference statistics. Same weights. v1 outcome shown alongside v2 outcome under the current NO-SIGNAL band.</p>
+    <div class="legend">
+      <span class="l-buy">BUY</span><span class="l-sell">SELL</span><span class="l-ns">NO SIGNAL</span>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>PPI date</th><th>Score S</th><th>v1 call</th><th>v2 call</th><th>Bar</th><th>Status</th></tr></thead>
+        <tbody id="backtestBody"></tbody>
+      </table>
+    </div>
+    <div class="metricrow">
+      <div class="metric"><div class="small">v1 reproductions (unchanged)</div><div class="num" id="matchCount">—</div></div>
+      <div class="metric"><div class="small">NO SIGNAL reclassifications</div><div class="num" id="reclassCount">—</div></div>
+    </div>
+    <h3>Baseline comparison</h3>
+    <p class="muted" style="margin-top:2px">Always-BUY agrees with the 8-case model <strong id="baselineAgree">—</strong> times. Because each Z-score is centered on the same 8 observations, Σ S = 0 identically, forcing a mechanical 4/4 BUY–SELL split. <strong>That balance is a calibration artifact, not market skill.</strong></p>
+  </section>
+
+  <!-- Section 7 — Vintage enforcement -->
+  <section class="card">
+    <h2>7. Vintage enforcement</h2>
+    <p class="muted" style="margin-top:-6px">Mark each indicator as genuinely available at the forecast cutoff. Calculate is <strong>refused</strong> while any input is flagged unavailable — this is the only way to prevent silent look-ahead.</p>
+    <div id="vintageGrid" class="grid"></div>
+    <div id="vintageStatus" class="banner banner-ok" style="margin-top:12px">All inputs marked available.</div>
+    <details>
+      <summary>Publication-lag reference (typical US release timing)</summary>
+      <table>
+        <thead><tr><th>Indicator</th><th>Typical timing</th><th>Risk at mid-month PPI cutoff</th></tr></thead>
+        <tbody>
+          <tr><td>Crude 24h Δ</td><td>Daily; window must be frozen</td><td>Low — but window definition matters</td></tr>
+          <tr><td>Copper 24h Δ</td><td>Daily; window must be frozen</td><td>Low — but window definition matters</td></tr>
+          <tr><td>CRB 5-day Δ</td><td>Daily</td><td>Low</td></tr>
+          <tr><td>BDI daily Δ</td><td>Daily</td><td>Low</td></tr>
+          <tr><td>ISM Prices Paid</td><td>~1st business day</td><td>Medium — verify before cutoff</td></tr>
+          <tr><td>S&amp;P US PMI Input Prices</td><td>~3rd business day</td><td>Medium — verify before cutoff</td></tr>
+          <tr><td>Cass Freight MoM</td><td>Monthly, multi-week lag</td><td><strong>High</strong> — often stale</td></tr>
+          <tr><td>GSCPI level</td><td>Monthly, multi-week lag</td><td><strong>High</strong> — often unavailable</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+  <!-- Section 8 — Recalibration -->
+  <section class="card">
+    <h2>8. Recalibration — advanced (changes outcomes)</h2>
+    <p class="muted" style="margin-top:-6px">Editing means, SDs, or weights will produce different scores and potentially different calls. Defaults are the frozen v1 calibration that reproduces the 8 historical calls.</p>
+    <details>
+      <summary>Show editable calibration table</summary>
+      <div class="calib-row" style="font-weight:700;color:#cfe0ff;border-bottom:1px solid #2a3855"><div>Indicator</div><div>μ</div><div>σ</div><div>w</div></div>
+      <div id="calibEditor"></div>
+      <div class="actions">
+        <button type="button" class="secondary" id="resetCalib">Restore v1 defaults</button>
+        <button type="button" class="danger-btn" id="applyCalib">Apply &amp; recompute</button>
+      </div>
+    </details>
+    <div id="calibWarning"></div>
+  </section>
+
+  <!-- Section 9 — Honest calibration status -->
+  <section class="card">
+    <h2>9. Honest calibration status</h2>
+    <p class="muted" style="margin-top:-6px">What v2 is, and what it is not.</p>
+    <h3>What v2 is</h3>
+    <ul class="muted">
+      <li>An <strong>exact reproduction engine</strong> for the v1 equation. Every one of the eight v1 calls is preserved bit-for-bit at default configuration.</li>
+      <li>A <strong>transparent audit tool</strong>: exact Z-scores, weighted contributions, flip-distances, and bootstrap fragility are all surfaced.</li>
+      <li>A <strong>look-ahead guard</strong>: computation is refused when any input is flagged unavailable at the forecast cutoff.</li>
+      <li>A <strong>NO SIGNAL classifier</strong> that refuses to output a directional call when |S| falls inside a user-configurable band. Only June 11 triggers it at default settings.</li>
+      <li>A <strong>manual-input model</strong> with full original section — eight numeric fields, gold-trend select, vintage cutoff text — all present and wired into the audit report.</li>
+    </ul>
+    <h3>What v2 cannot be</h3>
+    <ul class="muted">
+      <li><strong>Out-of-sample skill.</strong> n = 8, p = 8 → df = 0. The weights are the unique exact solution of Z·w = y.</li>
+      <li><strong>An independent prior.</strong> The reference means and SDs are the sample statistics of the same eight cases. True out-of-sample skill requires a prior-only reference window and ≥ ~30 releases.</li>
+      <li><strong>A probability.</strong> S is a signed projection, not a win probability. The magnitude is not calibrated confidence.</li>
+      <li><strong>A causal model.</strong> Signs of coefficients are fit artifacts under collinearity, not economic findings.</li>
+    </ul>
+    <h3>Roadmap to real validation</h3>
+    <ol class="muted">
+      <li>Expand to ≥30 PPI releases across multiple regimes.</li>
+      <li>Reduce to 3–5 predictors, pre-selected on economic grounds.</li>
+      <li>Compute reference means/SDs point-in-time from data strictly prior to each forecast.</li>
+      <li>Walk-forward test: one prediction at a time, weights re-fit only on prior data, labels pre-registered.</li>
+      <li>Report calibration — hit rate with a confidence interval, Brier score, baseline comparison.</li>
+      <li>Freeze the spec before seeing any outcome.</li>
+    </ol>
+  </section>
+  <div id="mcHistoryMount"></div>
+</main>
+<footer>© 2026 mayibongwecy · v2 Calibration Audit Edition · Equation preserved from v1</footer>
+
+<script>
+// ============================================================
+// Frozen v1 calibration
+// ============================================================
+const INDICATORS = [
+  {id:'crude',  name:'Crude oil 24h change (%)',          short:'Crude',  mean:1.1163, sd:2.1357, weight: 0.8475},
+  {id:'copper', name:'Copper 24h change (%)',             short:'Copper', mean:0.3625, sd:0.8834, weight:-0.2830},
+  {id:'crb',    name:'CRB 5-day change (%)',              short:'CRB',    mean:1.4625, sd:1.1011, weight:-1.9981},
+  {id:'bdi',    name:'Baltic Dry Index daily change (%)', short:'BDI',    mean:0.0700, sd:2.3823, weight: 2.8753},
+  {id:'gscpi',  name:'GSCPI level',                       short:'GSCPI',  mean:1.2718, sd:0.3583, weight:-2.6795},
+  {id:'cass',   name:'Cass Freight Expenditure MoM (%)',  short:'Cass',   mean:1.3438, sd:1.6995, weight: 0.2648},
+  {id:'ism',    name:'ISM Manufacturing Prices Paid',     short:'ISM',    mean:76.9250, sd:4.7447, weight:-2.5924},
+  {id:'pmi',    name:'S&P US PMI Input Prices',           short:'PMI',    mean:55.6000, sd:1.5313, weight:-1.8938}
+];
+
+let CALIB = INDICATORS.map(i => ({...i}));
+
+const CASES = [
+  {date:'2026-03-18', label:'March 18',    values:{crude: 4.12, copper: 0.45, crb: 1.80, bdi: 1.98, gscpi:0.680, cass: 4.90, ism:70.50, pmi:54.80}},
+  {date:'2026-04-14', label:'April 14',    values:{crude:-1.15, copper: 0.80, crb: 0.45, bdi:-0.75, gscpi:1.783, cass: 1.20, ism:78.30, pmi:56.40}},
+  {date:'2026-05-13', label:'May 13',      values:{crude: 2.40, copper: 1.15, crb: 3.20, bdi: 2.15, gscpi:1.808, cass:-0.45, ism:84.60, pmi:58.90}},
+  {date:'2026-06-11', label:'June 11',     values:{crude: 1.85, copper: 0.15, crb: 1.10, bdi: 0.85, gscpi:1.208, cass: 0.85, ism:82.10, pmi:55.20}},
+  {date:'2026-07-15', label:'July 15',     values:{crude:-0.90, copper:-0.65, crb:-0.25, bdi:-1.10, gscpi:0.928, cass:-1.15, ism:73.00, pmi:54.10}},
+  {date:'2026-08-13', label:'August 13',   values:{crude: 1.20, copper: 0.95, crb: 1.65, bdi: 3.40, gscpi:1.199, cass: 2.10, ism:71.10, pmi:53.60}},
+  {date:'2026-09-10', label:'September 10',values:{crude: 3.51, copper: 1.40, crb: 2.90, bdi:-1.40, gscpi:1.284, cass: 1.65, ism:77.90, pmi:55.90}},
+  {date:'2026-10-15', label:'October 15',  values:{crude:-2.10, copper:-1.35, crb: 0.85, bdi:-4.57, gscpi:1.284, cass: 1.65, ism:77.90, pmi:55.90}}
+];
+
+// ============================================================
+// Core math
+// ============================================================
+const fmt = (n, d=4) => Number(n).toFixed(d);
+
+function computeScore(values, calib) {
+  let score = 0;
+  const audit = [];
+  for (const ind of calib) {
+    const x = values[ind.id];
+    const z = (x - ind.mean) / ind.sd;
+    const contribution = z * ind.weight;
+    score += contribution;
+    audit.push({ind, x, mu: ind.mean, sd: ind.sd, z, weight: ind.weight, contribution});
+  }
+  return {score, audit};
+}
+
+function classify(score, band) {
+  if (Math.abs(score) < band) return 'NO SIGNAL';
+  return score > 0 ? 'BUY XAUUSD' : 'SELL XAUUSD';
+}
+
+function classOf(label) {
+  if (label === 'BUY XAUUSD') return 'buy';
+  if (label === 'SELL XAUUSD') return 'sell';
+  return 'nosignal';
+}
+
+function flipDistance(score, ind) {
+  const mag = Math.abs(score) * ind.sd / Math.abs(ind.weight);
+  const dir = (Math.sign(score) * Math.sign(ind.weight) > 0) ? '−' : '+';
+  return {mag, dir};
+}
+
+function randn() {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function bootstrapFlipProb(score, calib, sigma=0.10, iterations=1000) {
+  if (Math.abs(score) < 1e-9) return 0.5;
+  let flips = 0;
+  const s0 = Math.sign(score);
+  for (let i = 0; i < iterations; i++) {
+    let s = score;
+    for (const ind of calib) s += ind.weight * randn() * sigma;
+    if (Math.sign(s) !== s0) flips++;
+  }
+  return flips / iterations;
+}
+
+function correlation(xs, ys) {
+  const n = xs.length;
+  const mx = xs.reduce((a,b)=>a+b,0)/n;
+  const my = ys.reduce((a,b)=>a+b,0)/n;
+  let num = 0, dx = 0, dy = 0;
+  for (let i = 0; i < n; i++) {
+    num += (xs[i]-mx)*(ys[i]-my);
+    dx  += (xs[i]-mx)**2;
+    dy  += (ys[i]-my)**2;
+  }
+  if (dx === 0 || dy === 0) return 0;
+  return num / Math.sqrt(dx*dy);
+}
+
+// ============================================================
+// Live clock (SAST)
+// ============================================================
+function tick() {
+  const now = new Date();
+  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+  const sast = new Date(utc + 3600000 * 2);
+  const pad = n => String(n).padStart(2, '0');
+  document.getElementById('clock').textContent =
+    `${pad(sast.getHours())}:${pad(sast.getMinutes())}:${pad(sast.getSeconds())} SAST`;
+}
+setInterval(tick, 1000); tick();
+
+// ============================================================
+// Build vintage grid (defaults to Yes)
+// ============================================================
+const vintageGrid = document.getElementById('vintageGrid');
+vintageGrid.innerHTML = CALIB.map(ind => `
+  <div class="field">
+    <label for="vint_${ind.id}">${ind.short} — available at cutoff?</label>
+    <select id="vint_${ind.id}" data-ind="${ind.id}">
+      <option value="yes" selected>Yes — confirmed available</option>
+      <option value="uncertain">Uncertain / not verified</option>
+      <option value="no">No — published after cutoff</option>
+    </select>
+  </div>
+`).join('');
+
+function checkVintage() {
+  let bad = [], uncertain = [];
+  for (const ind of CALIB) {
+    const v = document.getElementById('vint_' + ind.id).value;
+    if (v === 'no') bad.push(ind.short);
+    else if (v === 'uncertain') uncertain.push(ind.short);
+  }
+  const el = document.getElementById('vintageStatus');
+  if (bad.length) {
+    el.className = 'banner banner-danger';
+    el.innerHTML = `<strong>VINTAGE VIOLATION — calculate blocked.</strong> Flagged as published after cutoff: <strong>${bad.join(', ')}</strong>.`;
+    return false;
+  }
+  if (uncertain.length) {
+    el.className = 'banner';
+    el.innerHTML = `<strong>Vintage uncertain:</strong> ${uncertain.join(', ')}. Calculate is allowed but the result should not be treated as a clean pre-release forecast.`;
+    return true;
+  }
+  el.className = 'banner banner-ok';
+  el.textContent = 'All inputs marked available at cutoff.';
+  return true;
+}
+document.querySelectorAll('#vintageGrid select').forEach(s => s.addEventListener('change', checkVintage));
+
+// ============================================================
+// Recalibration editor
+// ============================================================
+const calibEditor = document.getElementById('calibEditor');
+function renderCalib() {
+  calibEditor.innerHTML = CALIB.map((ind, i) => `
+    <div class="calib-row">
+      <div>${ind.short}</div>
+      <input type="text" inputmode="text" data-num data-nobtn autocomplete="off" step="any" data-i="${i}" data-k="mean"   value="${ind.mean}">
+      <input type="text" inputmode="text" data-num data-nobtn autocomplete="off" step="any" data-i="${i}" data-k="sd"     value="${ind.sd}">
+      <input type="text" inputmode="text" data-num data-nobtn autocomplete="off" step="any" data-i="${i}" data-k="weight" value="${ind.weight}">
+    </div>
+  `).join('');
+}
+renderCalib();
+
+document.getElementById('applyCalib').addEventListener('click', () => {
+  calibEditor.querySelectorAll('input').forEach(inp => {
+    const i = +inp.dataset.i, k = inp.dataset.k;
+    const v = parseFloat(inp.value);
+    if (Number.isFinite(v)) CALIB[i][k] = v;
+    else inp.value = CALIB[i][k];
+  });
+  const changed = CALIB.some((c, i) =>
+    c.mean !== INDICATORS[i].mean || c.sd !== INDICATORS[i].sd || c.weight !== INDICATORS[i].weight);
+  const warn = document.getElementById('calibWarning');
+  if (changed) {
+    warn.className = 'banner banner-danger'; warn.style.marginTop = '10px';
+    warn.innerHTML = '<strong>Recalibration applied.</strong> Outcomes may no longer reproduce v1. Compare against the backtest table below.';
+  } else {
+    warn.className = 'banner banner-ok'; warn.style.marginTop = '10px';
+    warn.textContent = 'Calibration matches v1 defaults.';
+  }
+  renderBacktest();
+  const vals = readValues();
+  if (vals) doCompute(vals, readAuxiliary());
+});
+
+document.getElementById('resetCalib').addEventListener('click', () => {
+  CALIB = INDICATORS.map(i => ({...i}));
+  renderCalib();
+  const warn = document.getElementById('calibWarning');
+  warn.className = 'banner banner-ok'; warn.style.marginTop = '10px';
+  warn.textContent = 'Restored v1 defaults.';
+  renderBacktest();
+});
+
+// ============================================================
+// Form state
+// ============================================================
+const form = document.getElementById('form');
+const biasEl = document.getElementById('bias');
+const biasNoteEl = document.getElementById('biasNote');
+const scoreEl = document.getElementById('score');
+const zcountEl = document.getElementById('zcount');
+const bandValEl = document.getElementById('bandVal');
+const bootProbEl = document.getElementById('bootProb');
+const auditBody = document.getElementById('auditBody');
+const auxRecordEl = document.getElementById('auxRecord');
+const flipBody = document.getElementById('flipBody');
+const bootstrapOut = document.getElementById('bootstrapOut');
+const vintageEl = document.getElementById('vintage');
+const noSignalBandEl = document.getElementById('noSignalBand');
+
+let lastReport = '';
+
+function getBand() {
+  const b = parseFloat(noSignalBandEl.value);
+  return Number.isFinite(b) && b >= 0 ? b : 1.0;
+}
+
+function readValues() {
+  const v = {};
+  for (const ind of CALIB) {
+    const raw = document.getElementById(ind.id).value.trim();
+    if (raw === '' || !Number.isFinite(Number(raw))) return null;
+    v[ind.id] = Number(raw);
+  }
+  return v;
+}
+
+function readAuxiliary() {
+  const gt = document.getElementById('goldTrend').value;
+  const gtLabel = gt === '1' ? 'Bullish' : gt === '-1' ? 'Bearish' : 'Neutral';
+  const cutoff = document.getElementById('cutoff').value.trim();
+  return {goldTrend: gtLabel, goldTrendCode: Number(gt), cutoff};
+}
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  const v = readValues();
+  if (!v) { alert('Please enter a valid numeric value for every indicator.'); return; }
+  if (!checkVintage()) { alert('Calculate blocked by vintage violation. Confirm availability first.'); return; }
+  doCompute(v, readAuxiliary());
+  if (window.MCH_HIST) window.MCH_HIST.record();
+});
+
+function resetOutputs() {
+  biasEl.textContent = 'Awaiting inputs';
+  biasEl.className = 'result neutral';
+  biasNoteEl.textContent = 'Enter all eight numeric indicators and calculate.';
+  scoreEl.textContent = '—'; scoreEl.className = 'num';
+  zcountEl.textContent = '0 / 8';
+  bootProbEl.textContent = '—';
+  auditBody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:left">Results will appear after calculating.</td></tr>';
+  auxRecordEl.innerHTML = '';
+  flipBody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:left">Calculate first.</td></tr>';
+  bootstrapOut.textContent = '—';
+  vintageEl.textContent = 'No cutoff label entered.';
+  lastReport = '';
+  document.getElementById('copyStatus').textContent = '';
+}
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  form.reset();
+  document.getElementById('goldTrend').value = '0';
+  document.querySelectorAll('#vintageGrid select').forEach(s => s.value = 'yes');
+  checkVintage();
+  resetOutputs();
+});
+
+document.getElementById('exampleBtn').addEventListener('click', () => {
+  const sample = {crude:'1.25', copper:'0.40', crb:'1.10', bdi:'-0.50', gscpi:'1.20', cass:'0.80', ism:'72.5', pmi:'55.0'};
+  for (const [id, value] of Object.entries(sample)) document.getElementById(id).value = value;
+  document.getElementById('goldTrend').value = '0';
+  document.getElementById('cutoff').value = '';
+  const v = readValues();
+  if (v && checkVintage()) doCompute(v, readAuxiliary());
+});
+
+document.getElementById('loadBtn').addEventListener('click', () => {
+  const c = CASES[0];
+  for (const ind of CALIB) document.getElementById(ind.id).value = c.values[ind.id];
+  document.getElementById('goldTrend').value = '0';
+  document.getElementById('cutoff').value = '14:15 SAST · 18 Mar 2026';
+  document.getElementById('vint_gscpi').value = 'uncertain';
+  document.getElementById('vint_cass').value  = 'uncertain';
+  checkVintage();
+  doCompute(c.values, readAuxiliary());
+});
+
+function doCompute(values, aux) {
+  const band = getBand();
+  const {score, audit} = computeScore(values, CALIB);
+  const label = classify(score, band);
+  const cls = classOf(label);
+  biasEl.textContent = label;
+  biasEl.className = 'result ' + cls;
+  scoreEl.textContent = (score >= 0 ? '+' : '') + fmt(score);
+  scoreEl.className = 'num ' + (score > 0 ? 'num-pos' : score < 0 ? 'num-neg' : '');
+  zcountEl.textContent = '8 / 8';
+  bandValEl.textContent = '±' + fmt(band, 2);
+
+  const abs = Math.abs(score);
+  let note;
+  if (label === 'NO SIGNAL') {
+    note = `|S| = ${fmt(abs,4)} is inside the NO SIGNAL band (${fmt(band,2)}). Direction cannot be stated with confidence.`;
+  } else if (abs < 2 * band) {
+    note = `|S| = ${fmt(abs,4)} is just outside the band (${fmt(band,2)}). Direction holds, but treat it as fragile.`;
+  } else if (abs < 5) {
+    note = `|S| = ${fmt(abs,4)} is comfortably outside the band. Direction is stable to input noise, though magnitude is not calibrated confidence.`;
+  } else {
+    note = `|S| = ${fmt(abs,4)} is far from zero. Direction is robust to input noise. Magnitude is not a probability.`;
+  }
+  biasNoteEl.textContent = note;
+
+  auditBody.innerHTML = audit.map(r => {
+    const signC = r.contribution >= 0 ? 'num-pos' : 'num-neg';
+    return `<tr>
+      <td>${r.ind.name}</td>
+      <td>${fmt(r.x, 4)}</td>
+      <td>${fmt(r.mu, 4)}</td>
+      <td>${fmt(r.sd, 4)}</td>
+      <td>${(r.z>=0?'+':'') + fmt(r.z)}</td>
+      <td>${(r.weight>=0?'+':'') + fmt(r.weight)}</td>
+      <td class="${signC}">${(r.contribution>=0?'+':'') + fmt(r.contribution)}</td>
+    </tr>`;
+  }).join('') + `<tr>
+    <td colspan="6"><strong>Total S</strong></td>
+    <td><strong>${(score>=0?'+':'') + fmt(score)}</strong></td>
+  </tr>`;
+
+  // Auxiliary (recorded, not scored)
+  auxRecordEl.innerHTML =
+    `<strong>Recorded for audit (coefficient = 0, not scored):</strong> ` +
+    `Pre-release gold trend: <strong>${aux.goldTrend}</strong>` +
+    ` · Vintage cutoff: <strong>${aux.cutoff || '(none entered)'}</strong>`;
+
+  // Flip distance
+  if (Math.abs(score) < 1e-6) {
+    flipBody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:left">S is already at zero — any input movement flips the sign. Maximally fragile.</td></tr>';
+  } else {
+    flipBody.innerHTML = audit.map(r => {
+      const {mag, dir} = flipDistance(score, r.ind);
+      const unit = ['gscpi','ism','pmi'].includes(r.ind.id) ? '' : '%';
+      let rating, ratingCls;
+      if (mag < 0.5)      { rating = 'Very fragile'; ratingCls = 'num-neg'; }
+      else if (mag < 2)   { rating = 'Fragile';      ratingCls = 'num-warn'; }
+      else if (mag < 10)  { rating = 'Moderate';     ratingCls = ''; }
+      else                { rating = 'Robust';       ratingCls = 'num-pos'; }
+      return `<tr>
+        <td>${r.ind.short}</td>
+        <td>${dir}${fmt(mag, 4)}${unit}</td>
+        <td>${dir === '+' ? 'increase' : 'decrease'}</td>
+        <td class="${ratingCls}">${rating}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Bootstrap
+  let p = 0.5;
+  if (Math.abs(score) < 1e-6) {
+    bootstrapOut.textContent = 'S = 0 exactly. Any perturbation flips the sign → 50% (definitional).';
+    bootProbEl.textContent = '50.0%';
+  } else {
+    p = bootstrapFlipProb(score, CALIB, 0.10, 1000);
+    let verdict;
+    if (p > 0.35) verdict = 'HIGH — sign is effectively a coin flip. NO SIGNAL is the honest call.';
+    else if (p > 0.10) verdict = 'MODERATE — sign can flip under realistic input noise.';
+    else if (p > 0.02) verdict = 'LOW — sign is stable under most perturbations.';
+    else verdict = 'VERY LOW — sign is robust across all bootstrap draws.';
+    bootstrapOut.textContent = `P(sign flip | σ_perturb = 0.10 in Z-space, n = 1000) = ${(p*100).toFixed(1)}%  —  ${verdict}`;
+    bootProbEl.textContent = (p*100).toFixed(1) + '%';
+  }
+
+  // Vintage record in output card
+  vintageEl.textContent = aux.cutoff
+    ? `${aux.cutoff} · Gold trend: ${aux.goldTrend}`
+    : `No cutoff label entered. Gold trend: ${aux.goldTrend}. Confirm all inputs were available before forecast cutoff.`;
+
+  // Save report
+  const vintageFlags = CALIB.map(ind => {
+    const v = document.getElementById('vint_' + ind.id).value;
+    return `${ind.short}: ${v}`;
+  }).join('; ');
+  lastReport =
+    `XAUUSD Pre-PPI Terminal v2 — Report\n` +
+    `Cutoff: ${aux.cutoff || 'not specified'}\n` +
+    `Gold trend (recorded, w=0): ${aux.goldTrend}\n` +
+    `NO SIGNAL band: |S| < ${fmt(band,2)}\n` +
+    `Bias: ${label}\n` +
+    `Score: ${(score>=0?'+':'') + fmt(score)}\n` +
+    `Audit:\n` + audit.map(r =>
+      `  ${r.ind.name}: x=${fmt(r.x)}, Z=${(r.z>=0?'+':'')+fmt(r.z)}, w=${fmt(r.weight)}, contrib=${(r.contribution>=0?'+':'')+fmt(r.contribution)}`
+    ).join('\n') +
+    `\nVintage: ${vintageFlags}\n` +
+    `Note: in-sample calibrated model; not validated future accuracy.\n`;
+
+  // Snapshot for the history module (no change to the model)
+  const _vint = {};
+  CALIB.forEach(ind => { _vint[ind.id] = document.getElementById('vint_' + ind.id).value; });
+  window.MC_LAST = {
+    values: Object.assign({}, values), aux, band, score, label, bootP: p, vintage: _vint,
+    audit: audit.map(r => ({id: r.ind.id, x: r.x, z: r.z, w: r.weight, c: r.contribution})),
+    calib: CALIB.map(c => ({id: c.id, mean: c.mean, sd: c.sd, weight: c.weight})),
+    calibEdited: CALIB.some((c, i) => c.mean !== INDICATORS[i].mean || c.sd !== INDICATORS[i].sd || c.weight !== INDICATORS[i].weight)
+  };
+}
+
+// ============================================================
+// Backtest replay
+// ============================================================
+function renderBacktest() {
+  const band = getBand();
+  const body = document.getElementById('backtestBody');
+  let preserved = 0, reclassified = 0, buyCount = 0;
+  const maxAbs = Math.max(...CASES.map(x => Math.abs(computeScore(x.values, CALIB).score))) || 1;
+  let rows = '';
+  for (const c of CASES) {
+    const {score} = computeScore(c.values, CALIB);
+    const v1 = score > 0 ? 'BUY XAUUSD' : score < 0 ? 'SELL XAUUSD' : 'NO SIGNAL';
+    const v2 = classify(score, band);
+    const cls = classOf(v2);
+    let status, statusCls;
+    if (v1 === v2) { status = 'preserved'; statusCls = 'tag tag-ok'; preserved++; }
+    else           { status = 'reclassified'; statusCls = 'tag tag-warn'; reclassified++; }
+    if (v2 === 'BUY XAUUSD') buyCount++;
+    const width = Math.min(100, Math.abs(score) / maxAbs * 100);
+    const barCls = cls === 'buy' ? 'bar-buy' : cls === 'sell' ? 'bar-sell' : 'bar-ns';
+    rows += `<tr class="case-row">
+      <td>${c.label}</td>
+      <td class="${score>0?'num-pos':score<0?'num-neg':''}">${(score>=0?'+':'') + fmt(score)}</td>
+      <td>${v1.replace(' XAUUSD','')}</td>
+      <td class="${cls === 'buy' ? 'num-pos' : cls === 'sell' ? 'num-neg' : 'num-warn'}">${v2.replace(' XAUUSD','')}</td>
+      <td><div class="bar-container"><div class="bar-fill ${barCls}" style="width:${width}%"></div></div></td>
+      <td><span class="${statusCls}">${status}</span></td>
+    </tr>`;
+  }
+  body.innerHTML = rows;
+  document.getElementById('matchCount').textContent = `${preserved} / 8`;
+  document.getElementById('reclassCount').textContent = `${reclassified}`;
+  document.getElementById('baselineAgree').textContent = `${buyCount}`;
+}
+
+// ============================================================
+// Correlation matrix
+// ============================================================
+function renderCorrelation() {
+  const tbl = document.getElementById('corrTable');
+  const ids = INDICATORS.map(i => i.id);
+  const shorts = INDICATORS.map(i => i.short);
+  const series = ids.map(id => CASES.map(c => c.values[id]));
+  const highPairs = [];
+  let html = '<thead><tr><th></th>';
+  shorts.forEach(s => html += `<th>${s}</th>`);
+  html += '</tr></thead><tbody>';
+  for (let i = 0; i < ids.length; i++) {
+    html += `<tr><td><strong>${shorts[i]}</strong></td>`;
+    for (let j = 0; j < ids.length; j++) {
+      if (i === j) html += `<td class="muted">1.00</td>`;
+      else {
+        const r = correlation(series[i], series[j]);
+        const cls = Math.abs(r) > 0.7 ? 'num-warn' : '';
+        if (i < j && Math.abs(r) > 0.7) highPairs.push(`${shorts[i]}–${shorts[j]} (r=${r.toFixed(2)})`);
+        html += `<td class="${cls}">${r.toFixed(2)}</td>`;
+      }
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+  const note = document.getElementById('collinearNote');
+  if (highPairs.length) {
+    note.innerHTML = `<strong>|r| &gt; 0.7 pairs:</strong> ${highPairs.join(', ')}. Fitted weights on these are unstable.`;
+  } else {
+    note.textContent = 'No pairs exceed |r| = 0.7 in this sample.';
+  }
+}
+
+// ============================================================
+// Copy button
+// ============================================================
+document.getElementById('copyBtn').addEventListener('click', () => {
+  if (!lastReport) {
+    document.getElementById('copyStatus').textContent = 'Calculate a prediction first.';
+    return;
+  }
+  const ta = document.createElement('textarea');
+  ta.value = lastReport;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); document.getElementById('copyStatus').textContent = 'Report copied.'; }
+  catch (e) { document.getElementById('copyStatus').textContent = 'Copy unavailable — select and copy manually.'; }
+  ta.remove();
+});
+
+// ============================================================
+// Band change handler
+// ============================================================
+noSignalBandEl.addEventListener('input', () => {
+  bandValEl.textContent = '±' + fmt(getBand(), 2);
+  renderBacktest();
+  const v = readValues();
+  if (v) doCompute(v, readAuxiliary());
+});
+
+// ============================================================
+// Initialize — blank state, no pre-load
+// ============================================================
+renderBacktest();
+renderCorrelation();
+checkVintage();
+resetOutputs();
+</script>
+<script>
+function mcSha256(s){
+  var K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  var H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  var u=unescape(encodeURIComponent(s)),l=u.length,w=[],i,j;
+  for(i=0;i<l;i++)w[i>>2]|=u.charCodeAt(i)<<(24-(i%4)*8);
+  w[l>>2]|=0x80<<(24-(l%4)*8);
+  w[(((l+8)>>6)+1)*16-1]=l*8;
+  for(i=0;i<w.length;i+=16){
+    var a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7],W=[];
+    for(j=0;j<64;j++){
+      if(j<16){W[j]=w[i+j]|0;}
+      else{var x=W[j-15],y=W[j-2];
+        var s0=((x>>>7)|(x<<25))^((x>>>18)|(x<<14))^(x>>>3);
+        var s1=((y>>>17)|(y<<15))^((y>>>19)|(y<<13))^(y>>>10);
+        W[j]=(W[j-16]+s0+W[j-7]+s1)|0;}
+      var S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+      var t1=(h+S1+((e&f)^(~e&g))+K[j]+W[j])|0;
+      var S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+      var t2=(S0+((a&b)^(a&c)^(b&c)))|0;
+      h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+    }
+    H[0]=(H[0]+a)|0;H[1]=(H[1]+b)|0;H[2]=(H[2]+c)|0;H[3]=(H[3]+d)|0;H[4]=(H[4]+e)|0;H[5]=(H[5]+f)|0;H[6]=(H[6]+g)|0;H[7]=(H[7]+h)|0;
+  }
+  var out='';for(i=0;i<8;i++){out+=('00000000'+(H[i]>>>0).toString(16)).slice(-8);}
+  return out;
+}
+function mcHashCode(code,salt){var h=mcSha256(salt+'|'+code);for(var i=0;i<2000;i++){h=mcSha256(h+salt);}return h;}
+
+/* ================= MC-CORE (added): lock, numeric input, history ================= */
+(function(){
+'use strict';
+var SALT='Qx7mV2kD', DEFAULT_HASH='5c1094938b751a9a686e695b623f3c6c09fd91c3911270a6d8815414e28e7c04';
+var OVERRIDE_KEY='mcLock_v1', FAIL_KEY='mcLockFail_v1';
+var $=function(id){return document.getElementById(id);};
+var root=document.documentElement;
+
+/* ---------- storage helpers ---------- */
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
+
+/* ---------- LOCK ---------- */
+var memFail={n:0,until:0};
+function getFail(){try{var r=JSON.parse(lsGet(FAIL_KEY)||'null');if(r&&typeof r.n==='number')return r;}catch(e){}return memFail;}
+function setFail(o){memFail=o;lsSet(FAIL_KEY,JSON.stringify(o));}
+function shapeOK(c){return /^[0-9]{2}[A-Za-z][0-9]{2}$/.test(c);}
+function target(){try{var o=JSON.parse(lsGet(OVERRIDE_KEY)||'null');if(o&&o.salt&&o.hash)return o;}catch(e){}return {salt:SALT,hash:DEFAULT_HASH};}
+function codeOK(c){if(!shapeOK(c))return false;var t=target();return mcHashCode(c.toUpperCase(),t.salt)===t.hash;}
+
+var door=$('mcDoor'),inp=$('mcCode'),go=$('mcGo'),msg=$('mcMsg'),lockTimer=null,relockTimer=null;
+function say(t){msg.textContent=t||'';}
+function secsLeft(u){return Math.max(0,Math.ceil((u-Date.now())/1000));}
+function tickLock(){
+  var f=getFail(),s=secsLeft(f.until);
+  if(s>0){go.disabled=true;say('Too many attempts. Wait '+s+'s.');lockTimer=setTimeout(tickLock,500);}
+  else{go.disabled=false;if(/Too many/.test(msg.textContent))say('');}
+}
+function openDoor(){
+  clearTimeout(relockTimer);
+  root.classList.remove('mc-locked');
+  door.classList.add('open');
+  inp.value='';say('');
+  setFail({n:0,until:0});
+  try{document.activeElement&&document.activeElement.blur();}catch(e){}
+}
+function closeDoor(){
+  inp.value='';say('');
+  door.classList.remove('open');
+  void door.offsetWidth;
+  clearTimeout(relockTimer);
+  relockTimer=setTimeout(function(){root.classList.add('mc-locked');},1150);
+  setTimeout(function(){try{inp.focus();}catch(e){}},1200);
+}
+function attempt(){
+  var f=getFail();
+  if(secsLeft(f.until)>0){tickLock();return;}
+  var c=inp.value;
+  if(c==='')return;
+  if(codeOK(c)){openDoor();return;}
+  f.n=(f.n||0)+1;
+  if(f.n%5===0){var lvl=Math.floor(f.n/5);f.until=Date.now()+Math.min(900,30*Math.pow(2,lvl-1))*1000;}
+  setFail(f);
+  inp.value='';
+  say('Access denied');
+  var pad=door.querySelector('.mc-pad');pad.classList.remove('mc-shake');void pad.offsetWidth;pad.classList.add('mc-shake');
+  tickLock();
+}
+go.addEventListener('click',attempt);
+inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();attempt();}});
+$('mcLockBtn').addEventListener('click',closeDoor);
+var dlg=$('mcCodeDlg'),dm=$('mcDlgMsg');
+function dmsg(t,ok){dm.textContent=t||'';dm.className='m'+(ok?' ok':'');}
+$('mcChgBtn').addEventListener('click',function(){$('mcOld').value='';$('mcNew').value='';$('mcNew2').value='';dmsg('');dlg.hidden=false;setTimeout(function(){$('mcOld').focus();},50);});
+$('mcDlgCancel').addEventListener('click',function(){dlg.hidden=true;});
+$('mcDlgSave').addEventListener('click',function(){
+  var o=$('mcOld').value,n=$('mcNew').value,n2=$('mcNew2').value;
+  if(!codeOK(o)){dmsg('Current code not accepted.');return;}
+  if(!shapeOK(n)){dmsg('New code not accepted.');return;}
+  if(n!==n2){dmsg('Codes do not match.');return;}
+  var salt=Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+  var ok=lsSet(OVERRIDE_KEY,JSON.stringify({salt:salt,hash:mcHashCode(n.toUpperCase(),salt)}));
+  if(!ok){dmsg('Could not store the new code in this browser.');return;}
+  dmsg('Code updated.',true);setTimeout(function(){dlg.hidden=true;},900);
+});
+tickLock();
+setTimeout(function(){try{if(!door.classList.contains('open'))inp.focus();}catch(e){}},1200);
+
+/* ---------- NUMERIC INPUT (negative sign allowed) ---------- */
+function clean(el){
+  var v=el.value,pos=el.selectionStart,out='',dot=false,rm=0,i,c;
+  if(pos==null)pos=v.length;
+  for(i=0;i<v.length;i++){
+    c=v.charAt(i);
+    if(/[\u2212\u2012-\u2015\uFE63\uFF0D]/.test(c))c='-';
+    if(c===',')c='.';
+    var ok=false;
+    if(c>='0'&&c<='9')ok=true;
+    else if(c==='.'&&!dot){ok=true;dot=true;}
+    else if(c==='-'&&out.length===0)ok=true;
+    if(ok)out+=c;else if(i<pos)rm++;
+  }
+  if(out!==v){el.value=out;try{el.setSelectionRange(pos-rm,pos-rm);}catch(e){}}
+}
+document.addEventListener('input',function(e){var t=e.target;if(t&&t.hasAttribute&&t.hasAttribute('data-num'))clean(t);},true);
+function toggleSign(el){
+  var v=el.value;
+  el.value=(v.charAt(0)==='-')?v.slice(1):'-'+v;
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  try{el.focus();}catch(e){}
+}
+function enhance(scope){
+  var list=(scope||document).querySelectorAll('input[data-num]:not([data-nobtn]):not([data-neg-done])');
+  Array.prototype.forEach.call(list,function(el){
+    el.setAttribute('data-neg-done','1');
+    var wrap=document.createElement('span');
+    wrap.className='mc-nw'+(el.classList.contains('w-20')?' mc-nw-inline':'');
+    el.parentNode.insertBefore(wrap,el);wrap.appendChild(el);
+    el.classList.add('mc-has-neg');
+    var b=document.createElement('button');
+    b.type='button';b.className='mc-neg';b.textContent='\u00B1';
+    b.title='Toggle negative sign';b.setAttribute('aria-label','Toggle negative sign');b.tabIndex=-1;
+    b.addEventListener('mousedown',function(ev){ev.preventDefault();});
+    b.addEventListener('click',function(){toggleSign(el);});
+    wrap.appendChild(b);
+  });
+}
+window.MCNum={enhance:enhance};
+enhance(document);
+
+/* ---------- HISTORY ---------- */
+var ALL_KEYS={CPI:'mcHistory_CPI_v1',FOMC:'mcHistory_FOMC_v1',NFP:'nfpGoldBiasHistory_v5',PPI:'mcHistory_PPI_v1'};
+var REACTIONS=['Up','Down','Whipsaw (both ways)','Flat / no move'];
+var VERDICTS=['Correct','Wrong','Partly right','No trade taken'];
+
+window.MCHistory=function(cfg){
+  var KEY=cfg.storageKey,MAX=cfg.max||2000,mount=$(cfg.mount||'mcHistoryMount');
+  if(!mount)return null;
+  var list=[],storageOK=true,openIds={},saveTimers={},toastTimer=null,lastExport=parseInt(lsGet(KEY+'_lastExport')||'0',10)||0;
+  var canShareFiles=false;
+  try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File(['{}'],'t.json',{type:'application/json'})]}))canShareFiles=true;}catch(e){}
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function sast(iso){try{return new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Johannesburg',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(new Date(iso));}catch(e){return iso;}}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+  function num(v){return (typeof v==='number')?String(Math.round(v*1e6)/1e6):String(v==null?'':v);}
+  function blankActual(){return {release:'',reaction:'',move:'',verdict:'',notes:'',updated:null};}
+
+  function normalize(e){
+    if(!e||typeof e!=='object')return null;
+    if(!e.inputs&&cfg.migrate){var m=cfg.migrate(e);if(m)e=m;}
+    if(!e.inputs)e.inputs={};
+    if(!e.outputs)e.outputs={};
+    if(!e.ts)e.ts=new Date().toISOString();
+    if(!e.id)e.id='legacy-'+e.ts;
+    if(!e.terminal)e.terminal=cfg.terminal;
+    var a=blankActual(),src=e.actual||{};for(var k in a){if(src[k]!=null)a[k]=src[k];}
+    e.actual=a;
+    return e;
+  }
+  function load(){
+    var raw=null;
+    try{raw=localStorage.getItem(KEY);}catch(err){storageOK=false;return [];}
+    if(!raw)return [];
+    try{var p=JSON.parse(raw);if(!Array.isArray(p))return [];return p.map(normalize).filter(Boolean);}
+    catch(err){lsSet(KEY+'_corrupt_backup',raw);return [];}
+  }
+  function save(){storageOK=lsSet(KEY,JSON.stringify(list));if(!storageOK){try{localStorage.setItem(KEY,JSON.stringify(list));storageOK=true;}catch(e){}}}
+
+  /* ----- summary line ----- */
+  function summary(e){
+    var call=e.outputs[cfg.callKey];if(call==null||call==='')call='—';
+    var cls=cfg.classify?cfg.classify(String(call)):'flat';
+    var sc=e.outputs[cfg.scoreKey],txt='—';
+    if(typeof sc==='number'&&isFinite(sc)){txt=(cfg.scorePrefix||'')+(sc>=0?'+':'\u2212')+Math.abs(sc).toFixed(cfg.scoreDigits==null?2:cfg.scoreDigits);}
+    return {call:call,cls:cls,score:txt};
+  }
+  function kvHTML(title,defs,data){
+    var seen={},html='';
+    function cell(d,v){var long=d.long||String(v).length>60;return '<div'+(long?' class="long"':'')+'><div class="k">'+esc(d.label)+'</div><div class="v">'+(v===''||v==null?'<span style="opacity:.5">—</span>':esc(num(v)))+'</div></div>';}
+    defs.forEach(function(d){seen[d.k]=1;html+=cell(d,data[d.k]);});
+    Object.keys(data).forEach(function(k){if(!seen[k])html+=cell({label:k},data[k]);});
+    return '<div class="mch-sec">'+esc(title)+'</div><div class="mch-kv">'+html+'</div>';
+  }
+  function sel(field,opts,val){
+    return '<select data-f="'+field+'"><option value="">— select —</option>'+opts.map(function(o){return '<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>';
+  }
+  function itemHTML(e){
+    var s=summary(e),a=e.actual,noted=!!(a.release||a.reaction||a.move||a.verdict||a.notes);
+    return '<details class="mch-item" data-id="'+esc(e.id)+'"'+(openIds[e.id]?' open':'')+'>'+
+      '<summary><span class="mch-ts">'+esc(sast(e.ts))+'</span><span class="mch-call '+s.cls+'">'+esc(s.call)+'</span><span class="mch-score">'+esc(s.score)+'</span>'+
+      (noted?'<span class="mch-noted" data-chip>\u270E outcome recorded</span>':'<span class="mch-pending" data-chip>outcome pending</span>')+'</summary>'+
+      '<div class="mch-body">'+kvHTML('Inputs',cfg.inputs,e.inputs)+kvHTML('Outputs',cfg.outputs,e.outputs)+
+      '<div class="mch-sec">What actually happened</div>'+
+      '<div class="mch-agrid">'+
+        '<label class="mch-f">Actual data released<input type="text" data-f="release" value="'+esc(a.release)+'" placeholder="e.g. headline vs forecast"></label>'+
+        '<label class="mch-f">Gold reaction'+sel('reaction',REACTIONS,a.reaction)+'</label>'+
+        '<label class="mch-f">Move size ($, negative = down)<input type="text" inputmode="decimal" data-num data-f="move" value="'+esc(a.move)+'"></label>'+
+        '<label class="mch-f">Was the model call'+sel('verdict',VERDICTS,a.verdict)+'</label>'+
+        '<label class="mch-f full">Notes \u2014 what actually happened<textarea data-f="notes" rows="4" placeholder="Write what happened after the release, how price behaved, what the model missed\u2026">'+esc(a.notes)+'</textarea></label>'+
+      '</div>'+
+      '<div class="mch-arow"><button type="button" class="mch-btn pri" data-act="saveOutcome">Save outcome</button><span class="mch-saved" data-saved></span><button type="button" class="mch-btn dng" data-act="del" style="margin-left:auto!important">Delete entry</button></div>'+
+      '</div></details>';
+  }
+  function pendingCount(){
+    return list.filter(function(e){var t=Date.parse(e.ts)||0,u=e.actual&&e.actual.updated?Date.parse(e.actual.updated)||0:0;return Math.max(t,u)>lastExport;}).length;
+  }
+  function render(){
+    var p=pendingCount();
+    $('mchCount').textContent=String(list.length);
+    var chip=$('mchChip');
+    if(!list.length){chip.className='mch-chip';chip.textContent='nothing saved yet';}
+    else if(p){chip.className='mch-chip warn';chip.textContent=p+' not exported yet';}
+    else{chip.className='mch-chip ok';chip.textContent='all exported';}
+    $('mchWarn').hidden=storageOK;
+    $('mchList').innerHTML=list.length?list.map(itemHTML).join(''):'<div class="mch-empty">No analyses recorded yet.</div>';
+    enhance($('mchList'));
+  }
+
+  /* ----- record ----- */
+  function record(){
+    var cap=cfg.capture&&cfg.capture();
+    if(!cap){toast(cfg.incompleteMsg||'Fill in all inputs first.');return false;}
+    if(cfg.dedupe&&list.length){
+      var top=list[0];
+      if(JSON.stringify(top.inputs)===JSON.stringify(cap.inputs)&&(Date.now()-Date.parse(top.ts))<300000){toast('Already saved.');return false;}
+    }
+    var e={id:uid(),ts:new Date().toISOString(),terminal:cfg.terminal,inputs:cap.inputs,outputs:cap.outputs,meta:cap.meta||{},actual:blankActual()};
+    if(cap.extra){for(var k in cap.extra)e[k]=cap.extra[k];}
+    list.unshift(e);if(list.length>MAX)list.length=MAX;
+    save();render();toast(storageOK?'Saved to history':'Saved for this session only \u2014 export it!');
+    return true;
+  }
+
+  /* ----- exports ----- */
+  function stamp(){var d=new Date(),p=function(n){return String(n).padStart(2,'0');};return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes());}
+  function markExported(){lastExport=Date.now();lsSet(KEY+'_lastExport',String(lastExport));render();}
+  function payload(){return JSON.stringify({app:'mayibongwecy XAUUSD terminals \u2014 history',version:1,terminal:cfg.terminal,exportedAt:new Date().toISOString(),schema:{inputs:cfg.inputs,outputs:cfg.outputs},entries:list},null,2);}
+  function allPayload(){
+    var t={};
+    Object.keys(ALL_KEYS).forEach(function(n){
+      if(n===cfg.terminal){t[n]={entries:list};return;}
+      try{var r=JSON.parse(lsGet(ALL_KEYS[n])||'[]');t[n]={entries:Array.isArray(r)?r:[]};}catch(e){t[n]={entries:[]};}
+    });
+    return JSON.stringify({app:'mayibongwecy XAUUSD terminals \u2014 history',version:1,scope:'all-terminals',exportedAt:new Date().toISOString(),terminals:t},null,2);
+  }
+  function csvCell(v){var s=String(v==null?'':v);return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+  function csv(){
+    var inK=cfg.inputs.map(function(d){return d.k;}),outK=cfg.outputs.map(function(d){return d.k;});
+    list.forEach(function(e){Object.keys(e.inputs).forEach(function(k){if(inK.indexOf(k)<0)inK.push(k);});Object.keys(e.outputs).forEach(function(k){if(outK.indexOf(k)<0)outK.push(k);});});
+    var head=['id','timestamp_sast','timestamp_utc','terminal'].concat(inK.map(function(k){return 'in_'+k;}),outK.map(function(k){return 'out_'+k;}),['actual_release','actual_gold_reaction','actual_move_usd','model_call_verdict','actual_notes','actual_updated','meta_json']);
+    var rows=[head.map(csvCell).join(',')];
+    list.forEach(function(e){
+      var r=[e.id,sast(e.ts),e.ts,e.terminal].concat(inK.map(function(k){return e.inputs[k];}),outK.map(function(k){return e.outputs[k];}),[e.actual.release,e.actual.reaction,e.actual.move,e.actual.verdict,e.actual.notes,e.actual.updated||'',JSON.stringify(e.meta||{})]);
+      rows.push(r.map(csvCell).join(','));
+    });
+    return '\uFEFF'+rows.join('\r\n');
+  }
+  function download(name,text,mime){
+    var blob=new Blob([text],{type:mime}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(function(){a.remove();URL.revokeObjectURL(url);},2000);
+  }
+  function needData(){if(!list.length){toast('Nothing to export yet.');return false;}return true;}
+  function copyText(t){
+    if(navigator.clipboard&&navigator.clipboard.writeText){return navigator.clipboard.writeText(t).then(function(){return true;},function(){return fallbackCopy(t);});}
+    return Promise.resolve(fallbackCopy(t));
+  }
+  function fallbackCopy(t){var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();return ok;}
+
+  /* ----- import ----- */
+  function importText(text){
+    var obj;try{obj=JSON.parse(text);}catch(e){toast('That file is not valid JSON.');return;}
+    var groups={};
+    if(Array.isArray(obj))groups[cfg.terminal]=obj;
+    else if(obj&&obj.terminals){Object.keys(obj.terminals).forEach(function(t){var v=obj.terminals[t];groups[t]=Array.isArray(v)?v:(v&&v.entries)||[];});}
+    else if(obj&&Array.isArray(obj.entries))groups[obj.terminal||cfg.terminal]=obj.entries;
+    else{toast('No history entries found in that file.');return;}
+    var added=0,dupes=0;
+    Object.keys(groups).forEach(function(t){
+      if(!ALL_KEYS[t])return;
+      var incoming=groups[t].filter(function(x){return x&&typeof x==='object';});
+      if(t===cfg.terminal){
+        var ids={};list.forEach(function(e){ids[e.id]=1;});
+        incoming.forEach(function(x){var n=normalize(x);if(!n)return;if(ids[n.id]){dupes++;return;}ids[n.id]=1;list.push(n);added++;});
+        list.sort(function(a,b){return Date.parse(b.ts)-Date.parse(a.ts);});
+        if(list.length>MAX)list.length=MAX;
+        save();
+      }else{
+        var cur=[];try{cur=JSON.parse(lsGet(ALL_KEYS[t])||'[]');if(!Array.isArray(cur))cur=[];}catch(e){cur=[];}
+        var seen={};cur.forEach(function(e){seen[e.id||('legacy-'+e.ts)]=1;});
+        incoming.forEach(function(x){var id=x.id||('legacy-'+x.ts);if(seen[id]){dupes++;return;}seen[id]=1;cur.push(x);added++;});
+        cur.sort(function(a,b){return Date.parse(b.ts)-Date.parse(a.ts);});
+        lsSet(ALL_KEYS[t],JSON.stringify(cur));
+      }
+    });
+    render();toast('Imported '+added+' entr'+(added===1?'y':'ies')+(dupes?' ('+dupes+' already present)':'')+'.');
+  }
+
+  /* ----- toast ----- */
+  function toast(t){
+    var el=document.querySelector('.mch-toast');
+    if(!el){el=document.createElement('div');el.className='mch-toast';el.setAttribute('role','status');document.body.appendChild(el);}
+    el.textContent=t;el.style.display='block';clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.style.display='none';},2600);
+  }
+
+  /* ----- build UI ----- */
+  var th=cfg.theme||{};
+  var style=[];['panel','inner','line','text','muted','accent'].forEach(function(k){if(th[k])style.push('--mch-'+k+':'+th[k]);});
+  mount.innerHTML=
+    '<div class="mch" style="'+style.join(';')+'">'+
+      '<div class="mch-head"><div class="mch-title">'+esc(cfg.title||'Analysis History')+'<span class="mch-count" id="mchCount">0</span></div><span class="mch-chip" id="mchChip"></span></div>'+
+      '<p class="mch-sub">Every saved analysis keeps all inputs and outputs. Open an entry to record what actually happened. Entries live in this browser only \u2014 export regularly to keep a safe copy.</p>'+
+      '<div class="mch-warn" id="mchWarn" hidden>This browser is not allowing history to be stored (private mode or blocked storage). Entries will be lost when you close the page \u2014 export after each session.</div>'+
+      '<div class="mch-bar">'+
+        (cfg.saveButton?'<button type="button" class="mch-btn pri" data-top="save">\uFF0B Save current analysis</button>':'')+
+        '<button type="button" class="mch-btn" data-top="json">Export JSON</button>'+
+        '<button type="button" class="mch-btn" data-top="csv">Export CSV</button>'+
+        (canShareFiles?'<button type="button" class="mch-btn" data-top="share">Share / Save to\u2026</button>':'')+
+        '<button type="button" class="mch-btn" data-top="copy">Copy JSON</button>'+
+        '<button type="button" class="mch-btn" data-top="all">Export all terminals</button>'+
+        '<button type="button" class="mch-btn" data-top="import">Import</button>'+
+        '<button type="button" class="mch-btn dng" data-top="clear">Clear all</button>'+
+        '<input type="file" id="mchFile" accept=".json,application/json" hidden>'+
+      '</div>'+
+      '<div id="mchList"></div>'+
+    '</div>';
+
+  mount.addEventListener('click',function(ev){
+    var b=ev.target.closest&&ev.target.closest('button');if(!b)return;
+    var top=b.getAttribute('data-top'),act=b.getAttribute('data-act');
+    if(top){
+      if(top==='save'){record();}
+      else if(top==='json'){if(!needData())return;download(cfg.terminal.toLowerCase()+'-history-'+stamp()+'.json',payload(),'application/json');markExported();toast('JSON downloaded');}
+      else if(top==='csv'){if(!needData())return;download(cfg.terminal.toLowerCase()+'-history-'+stamp()+'.csv',csv(),'text/csv;charset=utf-8');markExported();toast('CSV downloaded');}
+      else if(top==='all'){download('all-terminals-history-'+stamp()+'.json',allPayload(),'application/json');markExported();toast('All-terminals file downloaded');}
+      else if(top==='copy'){if(!needData())return;copyText(payload()).then(function(ok){if(ok){markExported();toast('History copied to clipboard');}else toast('Copy blocked \u2014 use Export JSON instead.');});}
+      else if(top==='share'){if(!needData())return;var f=new File([payload()],cfg.terminal.toLowerCase()+'-history-'+stamp()+'.json',{type:'application/json'});navigator.share({files:[f],title:cfg.terminal+' history'}).then(function(){markExported();},function(){});}
+      else if(top==='import'){$('mchFile').click();}
+      else if(top==='clear'){if(!list.length)return;if(confirm('Delete ALL saved history for this terminal? Export first if you want to keep it.')){list=[];save();render();toast('History cleared');}}
+      return;
+    }
+    if(act){
+      var it=b.closest('details.mch-item'),id=it&&it.getAttribute('data-id');if(!id)return;
+      if(act==='del'){if(confirm('Delete this entry?')){list=list.filter(function(e){return e.id!==id;});delete openIds[id];save();render();}}
+      else if(act==='saveOutcome'){flush(it,id);toast('Outcome saved');}
+    }
+  });
+  mount.addEventListener('toggle',function(ev){var d=ev.target;if(d&&d.classList&&d.classList.contains('mch-item'))openIds[d.getAttribute('data-id')]=d.open;},true);
+  $('mchFile').addEventListener('change',function(ev){
+    var f=ev.target.files&&ev.target.files[0];if(!f)return;
+    var r=new FileReader();r.onload=function(){importText(String(r.result||''));};r.readAsText(f);ev.target.value='';
+  });
+
+  function find(id){for(var i=0;i<list.length;i++)if(list[i].id===id)return list[i];return null;}
+  function flush(it,id){
+    var e=find(id);if(!e)return;
+    Array.prototype.forEach.call(it.querySelectorAll('[data-f]'),function(el){e.actual[el.getAttribute('data-f')]=el.value;});
+    e.actual.updated=new Date().toISOString();
+    save();
+    var a=e.actual,noted=!!(a.release||a.reaction||a.move||a.verdict||a.notes),chip=it.querySelector('[data-chip]');
+    if(chip){chip.className=noted?'mch-noted':'mch-pending';chip.textContent=noted?'\u270E outcome recorded':'outcome pending';}
+    var sv=it.querySelector('[data-saved]');if(sv){sv.textContent='Saved \u2713';setTimeout(function(){sv.textContent='';},1800);}
+    var c=$('mchChip'),p=pendingCount();if(c&&list.length){c.className=p?'mch-chip warn':'mch-chip ok';c.textContent=p?p+' not exported yet':'all exported';}
+  }
+  function auto(ev){
+    var el=ev.target;if(!el.getAttribute||!el.getAttribute('data-f'))return;
+    var it=el.closest('details.mch-item'),id=it&&it.getAttribute('data-id');if(!id)return;
+    clearTimeout(saveTimers[id]);saveTimers[id]=setTimeout(function(){flush(it,id);},600);
+  }
+  mount.addEventListener('input',auto);mount.addEventListener('change',auto);
+
+  list=load();
+  // persist any migrated legacy entries in the new format
+  if(list.length)save();
+  render();
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+  return {record:record,render:render,list:function(){return list;}};
+};
+})();
+
+/* ---- PPI history config ---- */
+(function(){
+var inDefs=INDICATORS.map(function(i){return {k:i.id,label:i.name};});
+inDefs.push({k:'goldTrend',label:'Pre-release gold trend (audit only)'},{k:'cutoff',label:'Vintage cutoff label'});
+INDICATORS.forEach(function(i){inDefs.push({k:'vint_'+i.id,label:'Vintage: '+i.short+' available at cutoff?'});});
+var outDefs=[{k:'score',label:'Composite score S'},{k:'bias',label:'Directional bias'},{k:'noSignalBand',label:'NO SIGNAL band used'},{k:'bootstrapFlipPct',label:'Bootstrap flip probability (%)'}];
+INDICATORS.forEach(function(i){outDefs.push({k:'z_'+i.id,label:'Z-score: '+i.short});});
+INDICATORS.forEach(function(i){outDefs.push({k:'contrib_'+i.id,label:'Contribution: '+i.short});});
+window.MCH_HIST=window.MCHistory({
+  terminal:'PPI',title:'Analysis History',storageKey:'mcHistory_PPI_v1',max:2000,dedupe:true,
+  theme:{panel:'#121a2d',inner:'#0a1222',line:'#2a3855',text:'#eef3ff',muted:'#9eacc7',accent:'#7dd3fc'},
+  callKey:'bias',scoreKey:'score',scoreDigits:4,
+  classify:function(t){return /BUY/i.test(t)?'up':/SELL/i.test(t)?'down':'flat';},
+  inputs:inDefs,outputs:outDefs,
+  capture:function(){
+    var L=window.MC_LAST;if(!L)return null;
+    var inputs={};
+    INDICATORS.forEach(function(i){inputs[i.id]=L.values[i.id];});
+    inputs.goldTrend=L.aux.goldTrend;inputs.cutoff=L.aux.cutoff;
+    Object.keys(L.vintage).forEach(function(k){inputs['vint_'+k]=L.vintage[k];});
+    var outputs={score:L.score,bias:L.label,noSignalBand:L.band,bootstrapFlipPct:Math.round(L.bootP*1000)/10};
+    L.audit.forEach(function(r){outputs['z_'+r.id]=r.z;outputs['contrib_'+r.id]=r.c;});
+    return {inputs:inputs,outputs:outputs,meta:{calibrationUsed:L.calib,calibrationEdited:L.calibEdited}};
+  }
+});
+})();
+
+</script>
+</body>
+</html>
