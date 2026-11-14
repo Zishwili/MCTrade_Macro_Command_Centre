@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d17">
+<title>MCTrade EST26 | Macro Command Centre</title>
+<style>
+:root{--bg:#080d17;--panel:#101827;--panel2:#131f31;--line:#25334a;--muted:#91a1b8;--text:#edf3fb;--gold:#e5bd62;--gold2:#f6d98f;--green:#43d6a0;--red:#ff7185;--blue:#79aaff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1000px 520px at 70% -15%,#1b2b43 0,transparent 65%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.top{height:68px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:#080d17dd;position:sticky;top:0;z-index:10;backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.13em}.mark{width:34px;height:34px;border:1px solid #806b3d;border-radius:10px;display:grid;place-items:center;color:var(--gold);font-size:18px;background:linear-gradient(145deg,#302718,#111827)}
+.brand small{display:block;color:var(--muted);font-size:9px;letter-spacing:.22em;font-weight:600}.topright{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}
+.pulse{width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block;box-shadow:0 0 12px var(--green)}
+.shell{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:calc(100vh - 68px)}
+aside{border-right:1px solid var(--line);padding:24px 14px;background:#0b1220}.navlabel{font-size:9px;color:#62738d;letter-spacing:.2em;font-weight:800;padding:12px 12px 8px}
+.nav{width:100%;border:1px solid transparent;background:transparent;color:#9aabc2;text-align:left;padding:11px 12px;border-radius:9px;margin:2px 0;display:flex;gap:12px;align-items:center;font-size:13px}.nav:hover,.nav.active{background:#18253a;color:var(--gold2);border-color:#2b3b54}.nav .ico{width:19px;text-align:center;color:var(--gold)}
+.sidefoot{position:sticky;top:calc(100vh - 110px);margin-top:42px;padding:14px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:10px}
+main{padding:30px clamp(16px,3vw,42px);min-width:0;max-width:1600px;width:100%;margin:auto}
+.eyebrow{font-size:10px;letter-spacing:.22em;color:var(--gold);font-weight:800;text-transform:uppercase}.hero{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin:5px 0 25px}.hero h1{font-size:clamp(25px,3vw,38px);line-height:1.1;margin:8px 0 9px;letter-spacing:-.04em}.hero p{color:var(--muted);margin:0;max-width:650px}.datebox{text-align:right;color:var(--muted);font:11px ui-monospace,monospace}.datebox strong{display:block;color:var(--text);font-size:15px;margin-top:4px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:20px 0}.metric,.panel,.terminal-card{background:linear-gradient(145deg,#121e30,#0e1725);border:1px solid var(--line);border-radius:13px}.metric{padding:16px}.metric label{display:block;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase}.metric strong{font:700 27px ui-monospace,monospace;display:block;margin:8px 0 3px}.metric small{color:var(--muted);font-size:10px}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:26px 0 12px}.sectionhead h2{font-size:14px;letter-spacing:.1em;text-transform:uppercase;margin:0}.sectionhead span{font-size:11px;color:var(--muted)}
+.termgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.terminal-card{padding:17px;position:relative;overflow:hidden}.terminal-card:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--gold)}.term-top{display:flex;justify-content:space-between;align-items:center}.term-code{font:10px ui-monospace,monospace;color:var(--gold);letter-spacing:.16em}.terminal-card h3{margin:7px 0 4px;font-size:18px}.terminal-card p{color:var(--muted);font-size:12px;min-height:37px;margin:0 0 14px}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:9px;padding:4px 7px;border-radius:5px;background:#1a2a40;color:#b8c8dd;border:1px solid #2b3e59}.actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.btn{border:1px solid #34445d;background:#17253a;color:#dce7f5;padding:9px 12px;border-radius:8px;font-size:11px;font-weight:700}.btn:hover{border-color:var(--gold);color:var(--gold2)}.btn.primary{background:linear-gradient(120deg,#e5bd62,#f4d991);border:0;color:#17130b}.btn.danger{color:#ff9aa8}.btn.small{padding:7px 10px}
+.panel{padding:18px;margin:14px 0}.panel h3{font-size:13px;margin:0 0 12px}.muted{color:var(--muted)}
+.promptbox{width:100%;min-height:340px;background:#080f1b;color:#cbd8e9;border:1px solid #2b3a52;border-radius:9px;padding:14px;font:11px/1.6 ui-monospace,monospace;resize:vertical}
+.toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:12px 0}
+select,input,textarea{background:#091321;color:var(--text);border:1px solid #31415a;border-radius:8px;padding:9px;min-width:0}label.field{display:block;color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase}label.field input,label.field select{display:block;width:100%;margin-top:5px}
+.formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.formgrid .wide{grid-column:span 2}.formgrid .full{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:760px}th{text-align:left;color:#8fa1bb;font-size:9px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;background:#111c2c;position:sticky;top:0}th,td{padding:10px 9px;border-bottom:1px solid #26344a;white-space:nowrap}td{color:#d6e0ed}td.num{text-align:right;font-family:ui-monospace,monospace}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:9px}
+.pill{padding:3px 7px;border-radius:20px;font-size:9px;font-weight:800}.buy{color:var(--green);background:#10372f}.sell{color:var(--red);background:#3c1c29}.flat{color:var(--gold);background:#3b3019}.good{color:var(--green)}.bad{color:var(--red)}
+.chart{width:100%;height:220px;background:#0b1422;border:1px solid var(--line);border-radius:9px;padding:8px}.chart svg{width:100%;height:100%;overflow:visible}
+iframe{width:100%;height:calc(100vh - 150px);min-height:720px;border:1px solid var(--line);border-radius:12px;background:#0b1020}
+.notice{border:1px solid #6a5530;background:#211d14;color:#e9d49d;border-radius:9px;padding:12px;font-size:11px;margin:14px 0}
+.lock{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 20%,#20314c,#080d17 65%);z-index:99;display:grid;place-items:center;padding:18px}.lockbox{width:min(420px,100%);background:#101b2b;border:1px solid #47536a;border-radius:18px;padding:28px;box-shadow:0 25px 90px #0009}.lockbox h1{margin:10px 0 5px;font-size:24px}.lockbox p{color:var(--muted);font-size:12px}.lockbox input{width:100%;margin:10px 0}.lockbox .btn{width:100%;margin-top:8px}
+.toast{position:fixed;bottom:18px;right:18px;background:#182b3d;border:1px solid #426078;color:#dff8ef;padding:10px 14px;border-radius:8px;z-index:120;font-size:11px}
+@media(max-width:900px){.shell{grid-template-columns:1fr}aside{display:flex;overflow:auto;padding:8px;border-right:0;border-bottom:1px solid var(--line);position:sticky;top:68px;z-index:8}.navlabel,.sidefoot{display:none}.nav{white-space:nowrap;width:auto}.cards{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.top{padding:0 14px}.topright .statusword{display:none}main{padding:20px 13px}.hero{display:block}.datebox{text-align:left;margin-top:14px}.termgrid{grid-template-columns:1fr}.cards{gap:8px}.metric{padding:12px}.metric strong{font-size:22px}.formgrid{grid-template-columns:1fr 1fr}.formgrid .wide{grid-column:span 2}.actions .btn{flex:1}}
+</style></head>
+<body>
+<div id="lock" class="lock"><div class="lockbox">
+<div class="eyebrow">Private workspace · Local vault</div><h1 id="lockTitle">MCTrade EST26 Command Centre</h1>
+<p id="lockText">Create a vault passphrase to encrypt your local journal and terminal performance records on this device. Your passphrase is never sent anywhere.</p>
+<input id="pass" type="password" autocomplete="current-password" placeholder="Vault passphrase (12+ characters)">
+<input id="pass2" class="hidden" type="password" autocomplete="new-password" placeholder="Repeat passphrase">
+<button class="btn primary" id="unlock">Create encrypted vault</button>
+<p style="font-size:10px;margin-top:14px">Important: this GitHub Pages edition is a static client-side workspace, not server-side authentication. See SECURITY.md before storing sensitive information.</p>
+</div></div>
+<header class="top"><div class="brand"><div class="mark">A</div><div>MCTRADE EST26 <small>COMMAND CENTRE</small></div></div><div class="topright"><span><i class="pulse"></i> <span class="statusword">LOCAL VAULT ACTIVE</span></span><span id="clock"></span><button class="btn small" id="lockNow">Lock</button></div></header>
+<div class="shell"><aside>
+<div class="navlabel">WORKSPACE</div>
+<button class="nav active" data-view="overview"><span class="ico">◈</span> Overview</button>
+<button class="nav" data-view="prompts"><span class="ico">⌘</span> Data acquisition prompts</button>
+<div class="navlabel">TERMINALS</div>
+<button class="nav" data-view="cpi"><span class="ico">◉</span> Pre-CPI terminal</button>
+<button class="nav" data-view="fomc"><span class="ico">◉</span> Pre-FOMC terminal</button>
+<button class="nav" data-view="nfp"><span class="ico">◉</span> Pre-NFP terminal</button>
+<button class="nav" data-view="ppi"><span class="ico">◉</span> Pre-PPI terminal</button>
+<div class="navlabel">INTELLIGENCE</div>
+<button class="nav" data-view="history"><span class="ico">▤</span> Event history</button>
+<button class="nav" data-view="performance"><span class="ico">⌁</span> Performance monitor</button>
+<button class="nav" data-view="backup"><span class="ico">⇧</span> Vault & backups</button>
+<div class="sidefoot">PRIVATE RESEARCH ENVIRONMENT<br><b style="color:var(--gold)">XAUUSD · MACRO EVENT MODELS</b><br><br>Local encrypted records · Manual sourcing · Vintage-aware workflow</div>
+</aside><main id="main"></main></div>
+<div id="toast" class="toast hidden"></div>
+<script>
+const TERMS={
+cpi:{name:"Pre-CPI",code:"CPI / 14:15 SAST",file:"terminals/Pre-CPI_Terminal.html",desc:"Inflation, input-cost, labour and market confirmation inputs for the pre-release USD / gold bias.",tags:["14:15 SAST","Inflation","USD bias"],prompt:`Act as a forensic macro-data research analyst preparing the XAUUSD Pre-CPI terminal. Find and verify EVERY required input below for the exact upcoming CPI release. Be aggressive and exhaustive: search official releases, archived release pages, consensus calendars, primary data providers and timestamped market sources. Do not stop at the first result.
+
+REQUIRED TERMINAL PARAMETERS (report every item separately):
+1. ISM Manufacturing Prices Paid index
+2. ISM Services Prices / Prices Paid index
+3. S&P Global US PMI Input Prices index
+4. NFIB price / pricing plans indicator used by this terminal
+5. WTI crude oil 30-day percentage change
+6. US retail gasoline / AAA gasoline month-over-month percentage change
+7. Bloomberg Commodity Index (BCOM) month-over-month percentage change
+8. US 2-year Treasury yield intraday velocity / change proxy
+9. DXY / USD-strength proxy
+10. Average hourly earnings (AHE) or wage-growth input used by the terminal
+
+DATA RULES:
+- Respect the terminal's 14:15 SAST pre-release cutoff. State the exact cutoff date/time and convert to ET where applicable.
+- Use only information publicly available by that cutoff. No post-release values, hindsight, revised series, or later commentary.
+- Prefer primary/official sources: ISM, S&P Global, NFIB, AAA, EIA, ICE/DXY source, US Treasury/FRED, BLS. Use reputable timestamped market sources only where no official intraday series exists.
+- For each parameter give: value, unit, observation period, release/publication timestamp, source name, direct URL, and whether it is a fresh observation or carried forward.
+- Search deeply for unavailable values. If and only if a parameter cannot be verified as available by cutoff, use the most recent previously available observation for that SAME parameter. Give its original date and timestamp, explain the carry-forward, and do not estimate or fabricate.
+- Never substitute a different indicator silently. Never invent consensus, actuals, revisions, or missing values.
+- Distinguish index levels from percentage changes and bps. Show calculation for every derived percentage change.
+- Finish with a clean copy/paste table in the terminal's input order, then a missing-data audit and source list. Flag any value whose vintage or cutoff cannot be established.`},
+fomc:{name:"Pre-FOMC",code:"FOMC / T-15 MIN",file:"terminals/Pre-FOMC_Terminal.html",desc:"Vintage macro surprises, Fed communication, market pricing and Treasury-yield positioning.",tags:["T−15 minutes","Fed policy","Rates"],prompt:`Act as an institutional Federal Reserve event-data researcher. Build a fully sourced, as-of-cutoff input pack for the Pre-FOMC T-15 Minute Predictive Engine. Search aggressively across official releases, archived statements, Fed speeches, CME/FedWatch pricing and timestamped Treasury-market sources.
+
+REQUIRED PARAMETERS:
+1. Core CPI / PCE inflation delta: actual, forecast/consensus and prior
+2. NFP employment surprise: actual, forecast/consensus and prior (K jobs)
+3. ISM Services PMI: actual, forecast/consensus and prior
+4. Pre-blackout Fed speeches and comments: Waller, Jefferson, Powell and other relevant voting FOMC members; provide concise evidence-based NLP summary and exact speech dates
+5. FedWatch cut probability (%)
+6. US 2-year Treasury yield trend (basis points; define measurement window and direction)
+7. Current expected policy rate / target range
+
+DATA RULES:
+- Establish the FOMC decision timestamp and the terminal's T-15 minute cutoff in the event's local timezone; state ET and SAST conversions.
+- Freeze all data at T-15. Exclude the decision, statement, press conference, post-cutoff price action and hindsight.
+- For macro releases, preserve first-print/as-released actual and the consensus available immediately before publication. Show prior as it was known at cutoff; flag any revisions.
+- For speeches, use original Fed source/transcript where possible. Separate direct hawkish/dovish evidence from your interpretation. Do not attribute views unsupported by text.
+- For FedWatch, identify the exact observation time and probability definition (cut vs hold; target meeting).
+- For the 2Y trend, give source, start/end timestamps, yield levels and arithmetic change in bps; do not label a trend without the measured window.
+- If an item is unavailable by cutoff, search archives and alternate primary sources. Only then carry forward the latest previously available value for that same parameter, with its date and timestamp. Never estimate or fabricate.
+- Return values in exact terminal input order, with units, source URLs, timestamps, vintage status, and a copy/paste table. Add a missing-data audit.`},
+nfp:{name:"Pre-NFP",code:"NFP / 10:00 SAST",file:"terminals/Pre-NFP_Terminal.html",desc:"Four-indicator vintage employment model for pre-NFP XAUUSD directional bias.",tags:["10:00 SAST","Employment","Vintage locked"],prompt:`Act as a forensic US labour-market data researcher preparing the XAUUSD Pre-NFP Directional Bias Model. Search aggressively for the latest observations that were genuinely available at the model's exact 10:00 SAST Friday cutoff (convert to ET for that date).
+
+REQUIRED INPUTS:
+1. ADP Private Payrolls (K)
+2. ISM Manufacturing Employment index
+3. ISM Services Employment index
+4. Initial Claims 4-week moving average (K)
+
+DATA RULES:
+- Identify the exact NFP release date and freeze the information set at 10:00 SAST. Do not use any information published after that time, including the NFP report itself.
+- ADP: use the first published ADP National Employment Report value available by cutoff; identify report month, release timestamp and any later revision separately (do not replace first print).
+- ISM Manufacturing Employment: use the relevant first-release index value available by cutoff, with publication timestamp.
+- ISM Services Employment: use the relevant first-release index value available by cutoff, with publication timestamp.
+- Initial claims: calculate the 4-week average only from weekly first-release observations available by cutoff. List the four weeks and source values; do not silently use revised data.
+- Search official ADP, DOL/ETA, ISM and archived releases first. Use reputable secondary sources only to corroborate.
+- If a current observation was not yet published by cutoff, carry forward the most recent previously available observation for that SAME input. State its date, timestamp and why the newer release is excluded.
+- Never forecast, interpolate, fabricate, or substitute a different series.
+- Provide exact units, dates, direct URLs and vintage status. End with an exact input-order copy/paste table and missing-data audit.`},
+ppi:{name:"Pre-PPI",code:"PPI / PRE-RELEASE",file:"terminals/Pre-PPI_Terminal.html",desc:"Commodity, freight, supply-chain and factory-input pressure model with vintage enforcement and calibration audit.",tags:["Pre-release","Supply chain","8 indicators"],prompt:`Act as an institutional producer-price and supply-chain data researcher preparing the XAUUSD Pre-PPI terminal. Aggressively search official databases, original releases, archived data vintages and timestamped market sources for every input available at the terminal's specified cutoff.
+
+REQUIRED PARAMETERS (preserve terminal input order):
+1. Crude oil (WTI) 24-hour percentage change
+2. COMEX copper 24-hour percentage change
+3. CRB commodity index 5-day percentage change
+4. Baltic Dry Index (BDI) daily percentage change
+5. Global Supply Chain Pressure Index (GSCPI) latest published level
+6. Cass Freight Expenditure month-over-month percentage change
+7. ISM Manufacturing Prices Paid index
+8. S&P US PMI Input Prices index
+9. Pre-release gold trend (4H / 15M) — describe direction and exact observation window; this is a chart-derived manual input
+
+DATA RULES:
+- First establish the target PPI release date and the terminal's vintage cutoff. State exact local time, ET and SAST.
+- Only use data known by cutoff. Never use the PPI release itself, later market prices, hindsight, later revisions or revised historical vintages.
+- For market changes, provide both start and end values, timestamps, venue/source, calculation and timezone. Define 24h and 5-day windows precisely.
+- For BDI, GSCPI, Cass, ISM and S&P PMI, identify publication date/time and period represented. Do not confuse observation period with publication date.
+- Search official sources first: ICE/CME or verified exchange feeds for market data, Federal Reserve Bank of New York for GSCPI, Cass reports, ISM, S&P Global. Use reputable market-data sources when official intraday data is inaccessible.
+- For chart-derived gold trend, do not pretend to retrieve the user's TradingView chart. Give a clearly labelled manual-check instruction and do not fabricate the direction.
+- If a new release was not available by cutoff, carry forward the latest previously published observation for that SAME parameter. State the original date/time and mark CARRIED FORWARD.
+- Do not fill missing values with estimates or proxy indicators. No silent substitution.
+- Return a copy/paste table in exact terminal order with value, unit, period, timestamp, source URL and vintage status, followed by a missing-data audit.`}
+};
+let key=null, vault=null, records=[], active="overview", chartMode="all";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(s){$("toast").textContent=s;$("toast").classList.remove("hidden");setTimeout(()=>$("toast").classList.add("hidden"),2400)}
+function b64(a){return btoa(String.fromCharCode(...new Uint8Array(a)))}
+function un64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+async function derive(pass,salt){const mat=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:310000,hash:"SHA-256"},mat,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function encrypt(obj){const iv=crypto.getRandomValues(new Uint8Array(12)),data=new TextEncoder().encode(JSON.stringify(obj)),cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,data);return {iv:b64(iv),data:b64(cipher)}}
+async function decrypt(blob){const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:un64(blob.iv)},key,un64(blob.data));return JSON.parse(new TextDecoder().decode(plain))}
+async function persist(){localStorage.setItem("mctrade-vault",JSON.stringify({salt:vault.salt,check:vault.check,blob:await encrypt({records})}))}
+async function startVault(){
+ const p=$("pass").value, p2=$("pass2").value, saved=localStorage.getItem("mctrade-vault");
+ if(!saved){if(p.length<12){toast("Use at least 12 characters.");return}if(p!==p2){toast("Passphrases do not match.");return}
+ const salt=crypto.getRandomValues(new Uint8Array(16));key=await derive(p,salt);vault={salt:b64(salt),check:"MCTRADE-VAULT-V1"};records=[];await persist();openApp();return}
+ try{vault=JSON.parse(saved);key=await derive(p,un64(vault.salt));const obj=await decrypt(vault.blob);records=obj.records||[];openApp()}catch(e){toast("Incorrect passphrase or damaged vault.")}
+}
+function openApp(){$("lock").classList.add("hidden");$("pass").value="";$("pass2").value="";render();clock();setInterval(clock,1000)}
+function lock(){key=null;records=[];$("lock").classList.remove("hidden");$("main").innerHTML="";$("pass2").classList.add("hidden");$("lockTitle").textContent="MCTrade EST26 Command Centre";$("lockText").textContent="Enter your vault passphrase to decrypt your local journal.";$("unlock").textContent="Unlock encrypted vault"}
+function clock(){$("clock").textContent=new Date().toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"})}
+$("unlock").onclick=async()=>{if(!localStorage.getItem("mctrade-vault")){if($("pass2").classList.contains("hidden")){$("pass2").classList.remove("hidden");$("unlock").textContent="Create encrypted vault";return}}await startVault()};
+$("lockNow").onclick=lock;
+document.querySelectorAll(".nav").forEach(n=>n.onclick=()=>go(n.dataset.view));
+function go(v){active=v;document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.view===v));render()}
+function shell(title,sub,body){$("main").innerHTML=`<div class="eyebrow">MCTrade EST26 intelligence workspace</div><div class="hero"><div><h1>${title}</h1><p>${sub}</p></div><div class="datebox">LOCAL RESEARCH CLOCK<strong>${new Date().toLocaleDateString(undefined,{dateStyle:"full"})}</strong></div></div>${body}`}
+function stats(){const n=records.length,done=records.filter(r=>r.actual==="BUY"||r.actual==="SELL"),hits=done.filter(r=>r.prediction===r.actual).length,rate=done.length?Math.round(hits/done.length*100):0;return {n,done:done.length,hits,rate,points:done.reduce((a,r)=>a+(Number(r.points)||0),0)}}
+function overview(){const s=stats();shell("Your macro command centre","A private research cockpit for your XAUUSD event terminals. Launch a model, acquire its vintage-locked inputs, preserve every run and compare its bias with the candle that followed.",`
+<div class="cards"><div class="metric"><label>Recorded model runs</label><strong>${s.n}</strong><small>Across all terminals</small></div><div class="metric"><label>Directional observations</label><strong>${s.done}</strong><small>Actual Buy / Sell entered</small></div><div class="metric"><label>Directional hit rate</label><strong>${s.done?s.rate+"%":"—"}</strong><small>${s.hits} matched calls / ${s.done} scored</small></div><div class="metric"><label>Observed candle points</label><strong>${s.done?s.points.toLocaleString():"—"}</strong><small>Signed net points entered</small></div></div>
+<div class="sectionhead"><h2>Terminal dock</h2><span>Four independent event engines</span></div><div class="termgrid">${Object.entries(TERMS).map(([id,t])=>card(id,t)).join("")}</div>
+<div class="sectionhead"><h2>Research protocol</h2><span>Non-negotiable data discipline</span></div><div class="panel"><h3>Vintage integrity · No invented values</h3><p class="muted">Every prompt demands cutoff-aware primary sourcing, direct URLs, publication timestamps and explicit carry-forward of the last previously available value for the same parameter when the current observation is unavailable. The terminal remains a manual-input model: review every source before pasting values.</p><div class="tags"><span class="tag">AS-RELEASED</span><span class="tag">CUT-OFF ENFORCED</span><span class="tag">SOURCE TRACEABILITY</span><span class="tag">NO FABRICATION</span></div></div>`)}
+function card(id,t){return `<article class="terminal-card"><div class="term-top"><span class="term-code">${t.code}</span><span class="pill flat">DOCKED</span></div><h3>${t.name} Terminal</h3><p>${t.desc}</p><div class="tags">${t.tags.map(x=>`<span class="tag">${x}</span>`).join("")}</div><div class="actions"><button class="btn primary" onclick="go('${id}')">Open terminal ↗</button><button class="btn" onclick="go('prompts');$('promptSelect').value='${id}';showPrompt()">Acquire data prompt</button></div></article>`}
+function prompts(){shell("Data acquisition desk","Copy a terminal-specific research instruction into your research assistant or sourcing workflow. Prompts enforce cutoff discipline, vintage integrity and same-parameter carry-forward.",`
+<div class="panel"><div class="formgrid"><label class="field wide">Select terminal<select id="promptSelect">${Object.entries(TERMS).map(([k,t])=>`<option value="${k}">${t.name} · ${t.code}</option>`).join("")}</select></label><label class="field wide">Target event / release date<input id="eventDate" placeholder="e.g. 11 December 2026 CPI"></label></div><div class="toolbar"><span class="muted" style="font-size:11px">Prompt is a research brief, not an automated data feed.</span><button class="btn primary" onclick="copyPrompt()">Copy complete prompt</button></div><textarea id="promptText" class="promptbox" spellcheck="false"></textarea><div class="notice">Sourcing safeguard: if an input is not yet released at the cutoff, the prompt requires the latest previously available value for that exact parameter. It must not invent, interpolate or silently substitute.</div></div>`);$("promptSelect").onchange=showPrompt;showPrompt()}
+function showPrompt(){if(!$("promptText"))return;const id=$("promptSelect").value;const date=$("eventDate")?.value||"[INSERT EVENT DATE]";$("promptText").value=TERMS[id].prompt.replace("upcoming CPI release",`${date} release`).replace("upcoming CPI",date).replace("exact upcoming CPI release",`${date} release`).replace("exact upcoming CPI",date).replace("exact upcoming",date)}
+function copyPrompt(){showPrompt();const ta=$("promptText");ta.select();navigator.clipboard?.writeText(ta.value).then(()=>toast("Terminal sourcing prompt copied."),()=>{document.execCommand("copy");toast("Prompt copied.")})}
+function terminal(id){const t=TERMS[id];shell(`${t.name} terminal dock`,`${t.desc} The original terminal file is loaded unchanged in its own workspace below.`,`
+<div class="toolbar"><div class="tags"><span class="tag">${t.code}</span><span class="tag">ORIGINAL HTML ENGINE</span><span class="tag">MANUAL INPUT</span></div><div class="actions"><button class="btn" onclick="go('prompts');$('promptSelect').value='${id}';showPrompt()">Copy sourcing prompt</button><a class="btn" href="${t.file}" target="_blank" rel="noopener">Open standalone ↗</a></div></div>
+<div class="notice">The terminal is preserved as uploaded; this dock does not rewrite its formulas or internal controls. Use the terminal's own access code if it requests one.</div><iframe title="${t.name} terminal" src="${t.file}"></iframe>`)}
+function history(){shell("Event ledger","Every saved run captures the terminal's predicted bias and your manually observed TradingView candle direction and points movement. A scored row is a directional hit only when Buy/Sell matches.",`
+<div class="panel"><h3>Record a terminal run</h3><div class="formgrid">
+<label class="field">Terminal<select id="hTerm">${Object.entries(TERMS).map(([k,t])=>`<option value="${k}">${t.name}</option>`).join("")}</select></label>
+<label class="field">Event / release date<input id="hDate" type="date" value="${new Date().toISOString().slice(0,10)}"></label>
+<label class="field">Terminal prediction<select id="hPred"><option>BUY</option><option>SELL</option><option>NO SIGNAL</option></select></label>
+<label class="field">Model score / output<input id="hScore" placeholder="Optional score or confidence"></label>
+<label class="field">TradingView actual direction<select id="hActual"><option value="">Not entered yet</option><option>BUY</option><option>SELL</option></select></label>
+<label class="field">Points moved by that candle<input id="hPoints" type="number" step="any" placeholder="e.g. 185 or -92"></label>
+<label class="field wide">Source / cutoff note<input id="hVintage" placeholder="e.g. 14:15 SAST; first-print data; source URLs saved separately"></label>
+<label class="field wide">Notes<textarea id="hNotes" rows="2" placeholder="What happened, data gaps, context..."></textarea></label>
+</div><div class="actions"><button class="btn primary" onclick="addRecord()">Save to encrypted ledger</button><button class="btn" onclick="exportCSV()">Export ledger CSV</button></div></div>
+<div class="sectionhead"><h2>Comparison ledger</h2><span id="historyCount">${records.length} records</span></div><div class="tablewrap"><table><thead><tr><th>Date</th><th>Terminal</th><th>Model call</th><th>TV actual</th><th>Result</th><th>Points</th><th>Score / notes</th><th></th></tr></thead><tbody>${records.length?records.slice().reverse().map((r,i)=>row(r,records.length-1-i)).join(""):`<tr><td colspan="8" style="text-align:center;color:#8293aa;padding:28px">No event records yet. Save your first terminal result above.</td></tr>`}</tbody></table></div>`)}
+function row(r,i){const scored=r.actual==="BUY"||r.actual==="SELL",hit=scored&&r.prediction===r.actual;return `<tr><td>${esc(r.date)}</td><td>${esc(TERMS[r.term]?.name||r.term)}</td><td><span class="pill ${r.prediction==="BUY"?"buy":r.prediction==="SELL"?"sell":"flat"}">${esc(r.prediction)}</span></td><td>${r.actual?`<span class="pill ${r.actual==="BUY"?"buy":"sell"}">${r.actual}</span>`:"—"}</td><td>${scored?`<b class="${hit?"good":"bad"}">${hit?"HIT":"MISS"}</b>`:"PENDING"}</td><td class="num">${r.points===""?"—":esc(r.points)}</td><td title="${esc(r.notes)}">${esc(r.score||r.notes||"—").slice(0,35)}</td><td><button class="btn small danger" onclick="deleteRecord(${i})">×</button></td></tr>`}
+async function addRecord(){const r={id:crypto.randomUUID(),term:$("hTerm").value,date:$("hDate").value,prediction:$("hPred").value,score:$("hScore").value,actual:$("hActual").value,points:$("hPoints").value,vintage:$("hVintage").value,notes:$("hNotes").value,created:new Date().toISOString()};if(!r.date){toast("Enter the event date.");return}records.push(r);await persist();history();toast("Run saved to encrypted ledger.")}
+async function deleteRecord(i){if(!confirm("Delete this event record?"))return;records.splice(i,1);await persist();history()}
+function performance(){const s=stats(),scored=records.filter(r=>r.actual==="BUY"||r.actual==="SELL"),hits=scored.filter(r=>r.actual===r.prediction).length,miss=scored.length-hits;const by=Object.keys(TERMS).map(k=>{const a=scored.filter(r=>r.term===k),h=a.filter(r=>r.actual===r.prediction).length;return {k,n:a.length,h,rate:a.length?Math.round(h/a.length*100):0}});shell("Performance monitor","A transparent scorecard of recorded directional calls. Pending outcomes are excluded; this is a user-entered ledger, not independently verified model validation.",`
+<div class="cards"><div class="metric"><label>Scored observations</label><strong>${scored.length}</strong><small>Buy/Sell actuals entered</small></div><div class="metric"><label>Correct calls</label><strong>${hits}</strong><small>Prediction matched actual</small></div><div class="metric"><label>Directional accuracy</label><strong>${scored.length?Math.round(hits/scored.length*100)+"%":"—"}</strong><small>Simple hit rate</small></div><div class="metric"><label>Net points</label><strong>${scored.length?s.points.toLocaleString():"—"}</strong><small>Sum of manually entered signed candle points</small></div></div>
+<div class="panel"><div class="sectionhead" style="margin-top:0"><h2>Terminal accuracy comparison</h2><span>Only scored observations</span></div>${by.map(x=>`<div style="display:grid;grid-template-columns:110px 1fr 50px;gap:12px;align-items:center;margin:15px 0"><b style="font-size:11px">${TERMS[x.k].name}</b><div style="height:9px;background:#1d2a3e;border-radius:9px;overflow:hidden"><div style="height:100%;width:${x.rate}%;background:linear-gradient(90deg,#a9843d,#f1d58a)"></div></div><span style="font:11px ui-monospace,monospace;text-align:right">${x.n?x.rate+"%":"—"}</span></div><div class="muted" style="font-size:10px">${x.h}/${x.n} hits</div>`).join("")}</div>
+<div class="panel"><div class="sectionhead" style="margin-top:0"><h2>Outcome distribution</h2><span>Recorded Buy/Sell outcomes</span></div><div class="chart">${donut(hits,miss)}</div><div class="tags"><span class="tag">HITS ${hits}</span><span class="tag">MISSES ${miss}</span><span class="tag">PENDING ${records.length-scored.length}</span></div></div>
+<div class="panel"><h3>Interpretation discipline</h3><p class="muted" style="font-size:11px">The hit rate is descriptive only. It does not establish predictive validity, profitability, risk-adjusted performance or out-of-sample accuracy. Points are summed exactly as entered and may mix candle sizes unless you keep the observation definition consistent. Record the same post-event candle horizon for every event before comparing models.</p></div>`)}
+function donut(h,m){const total=h+m||1,p=h/total*100;return `<svg viewBox="0 0 400 180"><circle cx="90" cy="85" r="53" fill="none" stroke="#452637" stroke-width="18"/><circle cx="90" cy="85" r="53" fill="none" stroke="#43d6a0" stroke-width="18" stroke-dasharray="${p*3.33} 333" transform="rotate(-90 90 85)"/><text x="90" y="82" fill="#edf3fb" text-anchor="middle" font-size="23" font-weight="700">${Math.round(h/total*100)}%</text><text x="90" y="101" fill="#91a1b8" text-anchor="middle" font-size="9">HIT RATE</text><text x="180" y="65" fill="#43d6a0" font-size="12">Correct calls: ${h}</text><text x="180" y="91" fill="#ff7185" font-size="12">Incorrect calls: ${m}</text><text x="180" y="117" fill="#91a1b8" font-size="10">Scored total: ${h+m}</text></svg>`}
+function backup(){shell("Vault & continuity","Manage encrypted local research records. Export encrypted vault backups regularly and keep the passphrase separately.",`
+<div class="panel"><h3>Encrypted vault backup</h3><p class="muted" style="font-size:11px">Your journal is encrypted with AES-256-GCM. A PBKDF2-SHA-256 key is derived from your passphrase (310,000 iterations). The browser stores ciphertext in localStorage on this device only.</p><div class="actions"><button class="btn primary" onclick="downloadVault()">Download encrypted backup</button><label class="btn" for="restoreFile">Restore backup<input id="restoreFile" type="file" accept="application/json" class="hidden" onchange="restoreVault(event)"></label></div></div>
+<div class="panel"><h3>Data portability</h3><p class="muted" style="font-size:11px">CSV export contains decrypted ledger values. Store it securely. JSON backup remains encrypted and requires the same passphrase to unlock.</p><div class="actions"><button class="btn" onclick="exportCSV()">Export history CSV</button><button class="btn danger" onclick="wipeVault()">Delete local vault</button></div></div>
+<div class="notice"><b>GitHub Pages security reality:</b> this site is static. A JavaScript password gate cannot make a public GitHub Pages site private, and terminal HTML/source files remain downloadable by anyone who can access the repository/site. Keep the repository private where your GitHub plan permits, do not embed API keys or secrets, and use real server-side authentication (e.g. Cloudflare Access + protected backend/storage) for genuine access control. Local encryption protects saved records at rest on this browser; it does not hide the website source.</div>`)}
+function downloadVault(){const data=localStorage.getItem("mctrade-vault");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));a.download="aurum-encrypted-vault.json";a.click();URL.revokeObjectURL(a.href);toast("Encrypted backup downloaded.")}
+async function restoreVault(e){const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!obj.salt||!obj.blob)throw 0;localStorage.setItem("mctrade-vault",JSON.stringify(obj));lock();toast("Backup imported. Unlock using its original passphrase.")}catch{toast("That backup file is not valid.")}}
+function exportCSV(){const cols=["date","term","prediction","actual","points","score","vintage","notes"];const csv=[cols.join(","),...records.map(r=>cols.map(k=>'"'+String(k==="term"?(TERMS[r[k]]?.name||r[k]):r[k]??"").replace(/"/g,'""')+'"').join(","))].join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="aurum-event-history.csv";a.click();URL.revokeObjectURL(a.href)}
+async function wipeVault(){if(!confirm("Permanently delete the encrypted vault from this browser? Export a backup first if needed."))return;localStorage.removeItem("mctrade-vault");lock();toast("Local vault deleted.")}
+function render(){if(!key)return;({overview,prompts,history,performance,backup}[active]||(()=>terminal(active)))()}
+window.go=go;window.showPrompt=showPrompt;window.copyPrompt=copyPrompt;window.addRecord=addRecord;window.deleteRecord=deleteRecord;window.exportCSV=exportCSV;window.downloadVault=downloadVault;window.restoreVault=restoreVault;window.wipeVault=wipeVault;
+(function init(){if(!crypto?.subtle){$("lockText").textContent="This browser does not support Web Crypto. Open this site over HTTPS (GitHub Pages) in a modern browser.";return}if(localStorage.getItem("mctrade-vault")){$("pass2").classList.add("hidden");$("unlock").textContent="Unlock encrypted vault";$("lockText").textContent="Enter your passphrase to decrypt your local event ledger."}else{$("pass2").classList.remove("hidden");$("unlock").textContent="Create encrypted vault"}})();
+</script></body></html>
